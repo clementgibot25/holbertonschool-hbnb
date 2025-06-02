@@ -6,7 +6,6 @@ This directory contains several diagrams illustrating the architecture and key p
 
 The following diagrams are included:
 
-1.  **`Package_diagram.svg`**: A **Package Diagram** that provides a high-level structural view of the **HBNB application architecture**. It organizes the system into distinct layers that encapsulate different responsibilities. This architectural pattern promotes **modularity**, **scalability**, and **maintainability**.
 2.  **`business_logic_layer.md`**: A **Class Diagram** that outlines the main data models (entities) of the application, their attributes, methods, and relationships.
 3.  **`fetch_places_diagram.md`**: A **Sequence Diagram** detailing the process of a user searching for and fetching a list of places.
 4.  **`place_creation_diagram.md`**: A **Sequence Diagram** illustrating the workflow for a user creating a new place listing.
@@ -19,96 +18,7 @@ The following diagrams are included:
 
 ![Package Diagram](Package_diagram.svg)
 
-### Purpose
-The **Package Diagram** provides a high-level structural view of the **HBNB application architecture**. It organizes the system into distinct layers that encapsulate different responsibilities. This architectural pattern promotes **modularity**, **scalability**, and **maintainability**.
-
-### Components
-
-The architecture is divided into three main layers, each containing packages (modules) responsible for specific aspects of the system:
-
----
-
-#### Presentation Layer
-**Purpose**: Interface between the user and the system.
-
-**Responsibilities**:
-- Handle user input/output.
-- Validate input before passing it to the business layer.
-- Act as a façade that hides the complexity of the underlying logic.
-
-**Packages**:
-- **User Interface**: Provides views, forms, and interaction points for the end-user (CLI, web interface, etc.).
-- **Services/API**: RESTful endpoints or service classes that handle HTTP requests and prepare data for presentation.
-
----
-
-#### Business Logic Layer
-**Purpose**: Encapsulates the core functionality of the system.
-
-**Responsibilities**:
-- Process requests from the presentation layer.
-- Coordinate business rules and workflows.
-- Serve as the middle tier connecting the user interface and data access.
-
-**Packages (Entities)**:
-- **User**: Manages user-related operations (registration, login, etc.).
-- **Place**: Handles listings, location data, and place management.
-- **Amenity**: Represents available features for places.
-- **Review**: Manages user reviews, ratings, and validation logic.
-
-**Pattern Used**: Implements the **Facade Pattern**, providing a simplified interface to the complex business logic.
-
----
-
-#### Persistence Layer
-**Purpose**: Handles data storage and retrieval.
-
-**Responsibilities**:
-- Interact with the database (ORM or raw SQL).
-- Encapsulate all low-level data operations.
-
-**Package**:
-- **Database Access**: Module responsible for CRUD operations, managing connections, and querying the data store.
-
----
-
-### Flow Overview
-
-1. The **User** sends a request through the **Presentation Layer** (e.g., submitting a form or calling an API).
-2. The **Presentation Layer** delegates the task to the **Business Logic Layer** using the **Facade Pattern**.
-3. The **Business Logic Layer** processes the request, validates business rules, and interacts with the **Persistence Layer**.
-4. The **Persistence Layer** performs the required **database operations** (read/write).
-5. The result is passed **back up through the layers** and returned to the **User**.
-
----
-
-### Mermaid Package Diagram
-
-```mermaid
-flowchart TD
-    U[User] -->|User Request| PLayer
-
-    subgraph PLayer [Presentation Layer]
-        direction LR
-        API[Services/API]
-        UI[User Interface]
-    end
-    PLayer -->|Facade Pattern| BLLayer
-
-    subgraph BLLayer [Business Logic Layer]
-        direction LR
-        BUser[User]
-        BPlace[Place]
-        BAmenity[Amenity]
-        BReview[Review]
-    end
-    BLLayer -->|Database Operation| PL
-
-    subgraph PL [Persistence Layer]
-        direction LR
-        DB[Database Access]
-    end
-
+*   **Purpose**: The package diagram shows the high-level structure of the application, including the main packages, their relationships, and dependencies. It highlights the key components of the system, such as the Presentation Layer, Business Logic Layer, and Database Layer. This diagram is useful for understanding the organization of the codebase and how different components interact with one another.
 
 ### 2. Business Logic Layer (`business_logic_layer.md`)
 
