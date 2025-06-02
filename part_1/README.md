@@ -16,6 +16,8 @@ The following diagrams are included:
 
 ### 1. Business Logic Layer (`business_logic_layer.md`)
 
+![Business Logic Layer](https://www.mermaidchart.com/raw/92cf6e30-8ccb-4114-826c-ec5e7cfa489a?theme=dark&version=v0.1&format=svg)
+
 This class diagram provides a high-level view of the core entities in the HBNB system.
 
 *   **Purpose**: To define the structure of the data, including the properties of each entity and how they relate to one another.
@@ -38,6 +40,8 @@ This class diagram provides a high-level view of the core entities in the HBNB s
     *   Reviews are linked to both a User (author) and a Place.
 
 ### 2. Fetch Places Diagram (`fetch_places_diagram.md`)
+
+![Fetch Places Diagram](https://www.mermaidchart.com/raw/87e50b04-dc5a-4f06-a7ad-0f907c017e92?theme=dark&version=v0.1&format=svg)
 
 This sequence diagram illustrates the interactions when a user searches for places.
 
@@ -64,6 +68,8 @@ This sequence diagram illustrates the interactions when a user searches for plac
 
 ### 3. Place Creation Diagram (`place_creation_diagram.md`)
 
+![Place Creation Diagram](https://www.mermaidchart.com/raw/4177e42c-0402-47d5-9683-81c4f0fb2347?theme=dark&version=v0.1&format=svg)
+
 This sequence diagram details the process of a user creating a new place listing.
 
 *   **Purpose**: To outline the steps involved from the user initiating the creation of a place to its persistence in the database.
@@ -86,6 +92,8 @@ This sequence diagram details the process of a user creating a new place listing
 
 ### 4. Register User Diagram (`register_user_diagram.md`)
 
+![Register User Diagram](https://www.mermaidchart.com/raw/99ed0ffa-ad3a-4f45-a24e-6f2c3c966b26?theme=dark&version=v0.1&format=svg)
+
 This sequence diagram shows the workflow for new user registration.
 
 *   **Purpose**: To illustrate the sequence of events when a new user signs up for the service.
@@ -106,6 +114,8 @@ This sequence diagram shows the workflow for new user registration.
             3.  `BusinessLogic` informs `Presentation`, which returns a `201 Created` status to the `User`.
 
 ### 5. Submit Review Diagram (`submit_review_diagram.md`)
+
+![Submit Review Diagram](https://www.mermaidchart.com/raw/e956318a-7745-47f7-bf13-b9b9f9dbca5f?theme=dark&version=v0.1&format=svg)
 
 This sequence diagram covers two related processes: a user submitting a review for a place, and an administrator validating that review.
 
