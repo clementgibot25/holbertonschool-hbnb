@@ -18,6 +18,8 @@ The following diagrams are included:
 
 ![Package Diagram](Package_diagram.svg)
 
+*   **Purpose**: The package diagram shows the high-level structure of the application, including the main packages, their relationships, and dependencies. It highlights the key components of the system, such as the Presentation Layer, Business Logic Layer, and Database Layer. This diagram is useful for understanding the organization of the codebase and how different components interact with one another.
+
 ### 2. Business Logic Layer (`business_logic_layer.md`)
 
 ![Business Logic Layer](https://www.mermaidchart.com/raw/92cf6e30-8ccb-4114-826c-ec5e7cfa489a?theme=dark&version=v0.1&format=svg)
