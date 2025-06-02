@@ -1,5 +1,5 @@
 # holbertonschool-hbnb
-'''
+```mermaid
 ---
 config:
   theme: neo-dark
@@ -73,5 +73,4 @@ direction LR
     note for Place "Each Place is owned by one User (the owner). A User can own multiple Places."
     note for Place "A Place can have multiple Amenities. An Amenity can be shared between Places."
     note for Review "Each Review is linked to both a User (author) and a Place. A User can only review a Place once."
-
-'''
+```
