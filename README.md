@@ -2,10 +2,22 @@
 
 This directory contains several diagrams illustrating the architecture and key processes of the HBNB project. These diagrams are created using Mermaid.js and describe the data model and interactions between different components of the system.
 
+## Introduction
+
+This collection of system design diagrams aims to provide a clear, visual understanding of the HBNB project's internal structure and key workflows. Created using Mermaid.js, these diagrams are essential for anyone looking to grasp:
+
+*   The overall organization of the codebase.
+*   The main data models and how they relate to each other.
+*   Typical user interactions with the system.
+*   Backend processing flows and critical decision logic.
+*   Interactions between different architectural layers, such as the Presentation Layer, Business Logic Layer, and Database Layer.
+
+Each diagram is accompanied by a detailed explanation to ensure clarity and provide necessary context, making this documentation valuable for contributors, reviewers, and developers new to the project.
+
 ## Diagrams Overview
 
 The following diagrams are included:
-
+1.  **`Package_diagram.svg`**: A **Package Diagram** that provides a high-level structural view of the HBNB application architecture. It organizes the system into distinct layers that encapsulate different responsibilities. This architectural pattern promotes modularity, scalability, and maintainability.
 2.  **`business_logic_layer.md`**: A **Class Diagram** that outlines the main data models (entities) of the application, their attributes, methods, and relationships.
 3.  **`fetch_places_diagram.md`**: A **Sequence Diagram** detailing the process of a user searching for and fetching a list of places.
 4.  **`place_creation_diagram.md`**: A **Sequence Diagram** illustrating the workflow for a user creating a new place listing.
@@ -18,9 +30,47 @@ The following diagrams are included:
 
 ![Package Diagram](Package_diagram.svg)
 
-*   **Purpose**: The package diagram shows the high-level structure of the application, including the main packages, their relationships, and dependencies. It highlights the key components of the system, such as the Presentation Layer, Business Logic Layer, and Database Layer. This diagram is useful for understanding the organization of the codebase and how different components interact with one another.
+The Package Diagram provides a high-level structural view of the HBNB application architecture. It organizes the system into distinct layers that encapsulate different responsibilities. This architectural pattern promotes modularity, scalability, and maintainability.
 
-### 2. Business Logic Layer (`business_logic_layer.md`)
+#### Components
+
+The architecture is divided into three main layers, each containing packages (modules) responsible for specific aspects of the system:
+
+**Presentation Layer**
+
+*   **Purpose**: Interface between the user and the system.
+*   **Responsibilities**:
+    *   Handle user input/output.
+    *   Validate input before passing it to the business layer.
+    *   Act as a façade that hides the complexity of the underlying logic.
+*   **Packages**:
+    *   User Interface: Provides views, forms, and interaction points for the end-user (CLI, web interface, etc.).
+    *   Services/API: RESTful endpoints or service classes that handle HTTP requests and prepare data for presentation.
+
+**Business Logic Layer**
+
+*   **Purpose**: Encapsulates the core functionality of the system.
+*   **Responsibilities**:
+    *   Process requests from the presentation layer.
+    *   Coordinate business rules and workflows.
+    *   Serve as the middle tier connecting the user interface and data access.
+*   **Packages (Entities)**:
+    *   User: Manages user-related operations (registration, login, etc.).
+    *   Place: Handles listings, location data, and place management.
+    *   Amenity: Represents available features for places.
+    *   Review: Manages user reviews, ratings, and validation logic.
+*   **Pattern Used**: Implements the Facade Pattern, providing a simplified interface to the complex business logic.
+
+**Persistence Layer**
+
+*   **Purpose**: Handles data storage and retrieval.
+*   **Responsibilities**:
+    *   Interact with the database (ORM or raw SQL).
+    *   Encapsulate all low-level data operations.
+*   **Package**:
+    *   Database Access: Module responsible for CRUD operations, managing connections, and querying the data store.
+
+### 2. Business Logic Layer
 
 ![Business Logic Layer](https://www.mermaidchart.com/raw/92cf6e30-8ccb-4114-826c-ec5e7cfa489a?theme=dark&version=v0.1&format=svg)
 
@@ -45,7 +95,7 @@ This class diagram provides a high-level view of the core entities in the HBNB s
     *   Each Place is owned by one User.
     *   Reviews are linked to both a User (author) and a Place.
 
-### 3. Fetch Places Diagram (`fetch_places_diagram.md`)
+### 3. Fetch Places Diagram
 
 ![Fetch Places Diagram](https://www.mermaidchart.com/raw/87e50b04-dc5a-4f06-a7ad-0f907c017e92?theme=dark&version=v0.1&format=svg)
 
@@ -72,7 +122,7 @@ This sequence diagram illustrates the interactions when a user searches for plac
         *   If no places are found, it informs `Presentation`, which returns a `200 OK` with an empty list/message to the `User`.
         *   If places are found, it returns the list to `Presentation`, which then sends a `200 OK` with the list of places to the `User`.
 
-### 4. Place Creation Diagram (`place_creation_diagram.md`)
+### 4. Place Creation Diagram
 
 ![Place Creation Diagram](https://www.mermaidchart.com/raw/4177e42c-0402-47d5-9683-81c4f0fb2347?theme=dark&version=v0.1&format=svg)
 
@@ -96,7 +146,7 @@ This sequence diagram details the process of a user creating a new place listing
                 *   If successful, `Database` returns a success status and the new Place ID to `BusinessLogic`.
             3.  `BusinessLogic` informs `Presentation`, which returns a `201 Created` status with the Place ID to the `User`.
 
-### 5. Register User Diagram (`register_user_diagram.md`)
+### 5. Register User Diagram
 
 ![Register User Diagram](https://www.mermaidchart.com/raw/99ed0ffa-ad3a-4f45-a24e-6f2c3c966b26?theme=dark&version=v0.1&format=svg)
 
@@ -119,7 +169,7 @@ This sequence diagram shows the workflow for new user registration.
                 *   If successful, `Database` returns a success status to `BusinessLogic`.
             3.  `BusinessLogic` informs `Presentation`, which returns a `201 Created` status to the `User`.
 
-### 6. Submit Review Diagram (`submit_review_diagram.md`)
+### 6. Submit Review Diagram
 
 ![Submit Review Diagram](https://www.mermaidchart.com/raw/e956318a-7745-47f7-bf13-b9b9f9dbca5f?theme=dark&version=v0.1&format=svg)
 
