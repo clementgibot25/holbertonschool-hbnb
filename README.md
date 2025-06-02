@@ -1,77 +1,9 @@
 # holbertonschool-hbnb
-```mermaid
----
-config:
-  theme: neo-dark
-  layout: elk
----
-classDiagram
-direction LR
+![Business Logic Layer](https://www.mermaidchart.com/raw/92cf6e30-8ccb-4114-826c-ec5e7cfa489a?theme=dark&version=v0.1&format=svg)
 
-    class BaseModel {
-        -Unique_ID: UUID
-        -creation_time: datetime
-        -update_time: datetime
-        +create() bool
-        +update() bool
-        +delete() bool
-        +listed() list
+![register User](https://www.mermaidchart.com/raw/99ed0ffa-ad3a-4f45-a24e-6f2c3c966b26?theme=dark&version=v0.1&format=svg)
 
-    }
+submit review :
+![submit review](https://www.mermaidchart.com/raw/e956318a-7745-47f7-bf13-b9b9f9dbca5f?theme=dark&version=v0.1&format=svg)
 
-    class User {
-        +first_name: str
-        +last_name: str
-        +email: str
-        -password: str
-        +is_admin: bool
-        +is_owner: bool
-        +register() bool
-    }
-
-    class Place {
-        +title: str
-        +description: str
-        +price: float
-        +latitude: float
-        +longitude: float
-        +city: str
-        +state: str
-        #amenities: list
-        #review_list() list
-        +get_average_rating() float
-    }
-
-    class Amenity {
-        +name: str
-        +description: str
-    }
-
-    class Review {
-        +rating: int
-        +comment: str
-        +author: User
-        +for_place: Place
-        -approved: bool
-        -approved_by_admin() bool
-    }
-
-    <<abstract>> BaseModel
-
-    BaseModel <|-- User : inherits
-    BaseModel <|-- Place : inherits
-    BaseModel <|-- Amenity : inherits
-    BaseModel <|-- Review : inherits
-
-    User "1" o-- "0..*" Place : owns
-    Place "0..*" --> "0..*" Amenity : offers
-    User "1" --> "0..*" Review : writes
-    Place "1" --> "0..*" Review : has
-
-    note for BaseModel "BaseModel is abstract: provides common fields (ID, timestamps) and methods for all entities."
-    note for User "Users can be regular or administrators (admin boolean)."
-    note for Place "Each Place is owned by one User (the owner). A User can own multiple Places."
-    note for Place "A Place can have multiple Amenities. An Amenity can be shared between Places."
-    note for Review "Each Review is linked to both a User (author) and a Place. A User can only review a Place once."
-```
-![Diagramme UML](https://www.mermaidchart.com/raw/92cf6e30-8ccb-4114-826c-ec5e7cfa489a?theme=dark&version=v0.1&format=svg)
+![fetch places](https://www.mermaidchart.com/raw/87e50b04-dc5a-4f06-a7ad-0f907c017e92?theme=dark&version=v0.1&format=svg)
