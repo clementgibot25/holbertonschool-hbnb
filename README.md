@@ -74,3 +74,4 @@ direction LR
     note for Place "A Place can have multiple Amenities. An Amenity can be shared between Places."
     note for Review "Each Review is linked to both a User (author) and a Place. A User can only review a Place once."
 ```
+![Diagramme UML](https://www.mermaidchart.com/raw/92cf6e30-8ccb-4114-826c-ec5e7cfa489a?theme=dark&version=v0.1&format=svg)
