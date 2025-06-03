@@ -1,4 +1,4 @@
-![Header Banner](Header banner.jpeg)
+![Header Banner](Header_banner.jpeg)
 
 # HBNB - Holberton BnB
 
