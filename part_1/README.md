@@ -72,7 +72,7 @@ The architecture is divided into three main layers, each containing packages (mo
 
 ### 2. Business Logic Layer
 
-![Business Logic Layer](https://www.mermaidchart.com/raw/118fc7f1-1531-4ebd-8d6a-28c33d02b05a?theme=dark&version=v0.1&format=svg)
+<img src="./business_logic_layer.png" alt="Business Logic Layer" width="600"/>
 
 This class diagram provides a high-level view of the core entities in the HBNB system.
 
