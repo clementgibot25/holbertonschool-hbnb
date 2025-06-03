@@ -3,10 +3,10 @@
 Welcome to the HBNB project, a full-stack web application that allows users to rent places for short periods of time, similar to Airbnb. This project is developed as part of the Holberton School curriculum.
 
 ## Table of Contents
-1. [UML Diagrams](#uml-diagrams)
-2. [BM & API](#bm-api)
-3. [Auth & API](#auth-api)
-4. [Web interface](#web-interface)
+1. [UML Diagrams](./part_1)
+2. [BM & API](./part_2)
+3. [Auth & API](./part_3)
+4. [Web interface](./part_4)
 
 ## UML Diagrams (Part 1 - Completed)
 
