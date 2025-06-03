@@ -20,7 +20,7 @@ The following diagrams are included:
 1.  **`Package_diagram.svg`**: A **Package Diagram** that provides a high-level structural view of the HBNB application architecture. It organizes the system into distinct layers that encapsulate different responsibilities. This architectural pattern promotes modularity, scalability, and maintainability.
 2.  **`business_logic_layer.md`**: A **Class Diagram** that outlines the main data models (entities) of the application, their attributes, methods, and relationships.
 3.  **`fetch_places_diagram.md`**: A **Sequence Diagram** detailing the process of a user searching for and fetching a list of places.
-4.  **`place_creation_diagram.md`**: A **Sequence Diagram** illustrating the workflow for a user creating a new place listing.
+4.  **`place_creation_diagram.md`**: A **Sequence Diagram** illustrating the workflow for a user creating a new place.
 5.  **`register_user_diagram.md`**: A **Sequence Diagram** showing the steps involved in registering a new user.
 6.  **`submit_review_diagram.md`**: A **Sequence Diagram** describing the process for a user submitting a review for a place and an administrator validating that review.
 
@@ -30,7 +30,7 @@ The following diagrams are included:
 
 ![Package Diagram](Package_diagram.svg)
 
-The Package Diagram provides a high-level structural view of the HBNB application architecture. It organizes the system into distinct layers that encapsulate different responsibilities. This architectural pattern promotes modularity, scalability, and maintainability.
+This Package Diagram visually represents the structural organization of the HBNB application at a global level. By grouping components into layers with clearly defined responsibilities, this architectural design enhances modularity, adaptability, and maintainability.
 
 #### Components
 
@@ -126,12 +126,12 @@ This sequence diagram illustrates the interactions when a user searches for plac
 
 ![Place Creation Diagram](https://www.mermaidchart.com/raw/4177e42c-0402-47d5-9683-81c4f0fb2347?theme=dark&version=v0.1&format=svg)
 
-This sequence diagram details the process of a user creating a new place listing.
+This sequence diagram details the process of a user creating a new place.
 
 *   **Purpose**: To outline the steps involved from the user initiating the creation of a place to its persistence in the database.
 *   **Actors**: `User`, `Presentation`, `BusinessLogic`, `Database`.
 *   **Key Steps**:
-    1.  (Optional Prerequisite) `User` may first request a list of available amenities via `GET /amenities`. This involves `Presentation` -> `BusinessLogic` -> `Database` and back to display options to the user.
+    1.  `User` first request a list of available amenities via `GET /amenities`. This involves `Presentation` -> `BusinessLogic` -> `Database` and back to display options to the user.
     2.  `User` sends a `POST /places` request with place data (title, description, price, location, selected amenities) to `Presentation`.
     3.  `Presentation` layer validates the format of the input data.
         *   If invalid, returns a `400 Bad Request`.
