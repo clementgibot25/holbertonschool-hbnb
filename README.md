@@ -12,9 +12,10 @@ Welcome to the HBNB project, a full-stack web application that allows users to r
 
 The first part of the project focuses on system design using UML diagrams. The following diagrams are included in the `part_1` directory:
 
-- **Business Logic Layer**: A class diagram showing the core entities (BaseModel, User, Place, State, City, Amenity, Review) and their relationships.
+- **Package Diagram**: A package diagram showing the structural organization of the HBNB application at a global level.
+- **Business Logic Layer**: A class diagram showing the core entities (BaseModel, User, Place, Amenity, Review) and their relationships.
 - **Fetch Places**: A sequence diagram illustrating the process of searching and retrieving places.
-- **Place Creation**: A sequence diagram demonstrating the flow of creating a new place listing.
+- **Place Creation**: A sequence diagram demonstrating the flow of creating a new place.
 - **User Registration**: A sequence diagram showing the user registration process.
 - **Submit Review**: A sequence diagram for the review submission and validation process.
 
@@ -31,3 +32,8 @@ The first part of the project focuses on system design using UML diagrams. The f
 ## Web interface
 
 *To be implemented*
+
+## Authors
+- [Clément Gibot](https://github.com/clementgibot25)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/clementgibot25)
+- [Arnaud Tilawat](https://github.com/TilawatArnaud)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/TilawatArnaud)
+- [Maxime Naguet](https://github.com/Roupies)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/Roupies)
