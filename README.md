@@ -197,3 +197,8 @@ This sequence diagram covers two related processes: a user submitting a review f
         *   If the `reviewID` is not found, it returns an error to `BusinessLogic`, which results in a `404 Not Found` to the `User`.
         *   If the review is found and updated successfully, `Database` returns success to `BusinessLogic`.
     5.  `BusinessLogic` informs `Presentation`, which returns a `200 OK` (Review successfully validated) to the `User`.
+
+    ## Authors
+- [Clément Gibot](https://github.com/clementgibot25)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Badge](https://badgen.net/badge/icon/github?icon=github&label)
+- [Arnaud Tilawat](https://github.com/TilawatArnaud)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Badge](https://badgen.net/badge/icon/github?icon=github&label)
+- [Maxime Naguet](https://github.com/Roupies)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![Badge](https://badgen.net/badge/icon/github?icon=github&label)
