@@ -1,3 +1,5 @@
+![Header Banner](Header banner.jpeg)
+
 # HBNB - Holberton BnB
 
 Welcome to the HBNB project, a full-stack web application that allows users to rent places for short periods of time, similar to Airbnb. This project is developed as part of the Holberton School curriculum.
