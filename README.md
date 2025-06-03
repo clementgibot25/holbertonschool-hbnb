@@ -1,4 +1,4 @@
-![Header Banner](Header_banner.jpeg)
+<img src="Header_banner.jpeg" alt="Header Banner" width="600"/>
 
 # HBNB - Holberton BnB
 
