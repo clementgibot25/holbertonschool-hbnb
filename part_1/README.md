@@ -77,22 +77,37 @@ The architecture is divided into three main layers, each containing packages (mo
 This class diagram provides a high-level view of the core entities in the HBNB system.
 
 *   **Purpose**: To define the structure of the data, including the properties of each entity and how they relate to one another.
+
 *   **Key Entities**:
+    
     *   `BaseModel`: An abstract base class providing common attributes like `Unique_ID`, `creation_time`, and `update_time`, along with basic CRUD methods (`create`, `update`, `delete`, `listed`).
+    
     *   `User`: Represents a user of the system. Inherits from `BaseModel`. Attributes include `first_name`, `last_name`, `email`, `password` (private), `is_admin`, and `is_owner`. It has a `register()` method.
+    
     *   `Place`: Represents a property listing. Inherits from `BaseModel`. Attributes include `title`, `description`, `price`, location details (`latitude`, `longitude`, `city`, `state`), and a list of `amenities`. Methods include `review_list()` and `get_average_rating()`.
+    
     *   `Amenity`: Represents an amenity that a place can offer (e.g., Wi-Fi, pool). Inherits from `BaseModel`. Attributes include `name` and `description`.
+    
     *   `Review`: Represents a review written by a user for a place. Inherits from `BaseModel`. Attributes include `rating`, `comment`, `author` (User), `for_place` (Place), and `approved` (private boolean). It has an `approved_by_admin()` method.
 *   **Relationships**:
+    
     *   `User`, `Place`, `Amenity`, and `Review` all inherit from `BaseModel`.
+    
     *   A `User` can own zero or more `Place`s (one-to-many).
+    
     *   A `Place` can offer zero or more `Amenity`s, and an `Amenity` can be offered by multiple `Place`s (many-to-many).
+    
     *   A `User` can write zero or more `Review`s (one-to-many).
+    
     *   A `Place` can have zero or more `Review`s (one-to-many).
 *   **Notes**:
+    
     *   `BaseModel` is abstract.
+    
     *   Users can be regular users or administrators.
+    
     *   Each Place is owned by one User.
+    
     *   Reviews are linked to both a User (author) and a Place.
 
 ### 3. Fetch Places Diagram
