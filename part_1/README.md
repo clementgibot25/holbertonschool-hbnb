@@ -4,7 +4,7 @@ This directory contains several diagrams illustrating the architecture and key p
 
 ## Introduction
 
-This collection of system design diagrams aims to provide a clear, visual understanding of the HBNB project's internal structure and key workflows. Created using Mermaid.js, these diagrams are essential for anyone looking to grasp:
+This collection of system design diagrams aims to provide a clear, visual understanding of the HBNB project's internal structure and key workflows. Created using Mermaid.js, these diagrams are essential forls anyone looking to grasp:
 
 *   The overall organization of the codebase.
 *   The main data models and how they relate to each other.
@@ -72,7 +72,7 @@ The architecture is divided into three main layers, each containing packages (mo
 
 ### 2. Business Logic Layer
 
-![Business Logic Layer](https://www.mermaidchart.com/raw/118fc7f1-1531-4ebd-8d6a-28c33d02b05a?theme=dark&version=v0.1&format=svg)
+<img src="./business_logic_layer.png" alt="Business Logic Layer" width="463"/>
 
 This class diagram provides a high-level view of the core entities in the HBNB system.
 
@@ -80,19 +80,19 @@ This class diagram provides a high-level view of the core entities in the HBNB s
 *   **Key Entities**:
     *   `BaseModel`: An abstract base class providing common attributes like `Unique_ID`, `creation_time`, and `update_time`, along with basic CRUD methods (`create`, `update`, `delete`, `listed`).
     *   `User`: Represents a user of the system. Inherits from `BaseModel`. Attributes include `first_name`, `last_name`, `email`, `password` (private), `is_admin`, and `is_owner`. It has a `register()` method.
-    *   `Place`: Represents a property listing. Inherits from `BaseModel`. Attributes include `title`, `description`, `price`, location details (`latitude`, `longitude`, `city`, `state`), and a list of `amenities`. Methods include `review_list()` and `get_average_rating()`.
+    *   `Place`: Represents a property listing. Inherits from `BaseModel`. Attributes include `title`, `description`, `price`, location details (`latitude`, `longitude`, `city`, `state`), and `amenities` (protected list). Methods include `review_list()` (protected) and `get_average_rating()`.
     *   `Amenity`: Represents an amenity that a place can offer (e.g., Wi-Fi, pool). Inherits from `BaseModel`. Attributes include `name` and `description`.
-    *   `Review`: Represents a review written by a user for a place. Inherits from `BaseModel`. Attributes include `rating`, `comment`, `author` (User), `for_place` (Place), and `approved` (private boolean). It has an `approved_by_admin()` method.
+    *   `Review`: Represents a review written by a user for a place. Inherits from `BaseModel`. Attributes include `rating`, `comment`, `author` (User), `for_place` (Place), and `approved` (private boolean). It has a private `approved_by_admin()` method.
 *   **Relationships**:
     *   `User`, `Place`, `Amenity`, and `Review` all inherit from `BaseModel`.
-    *   A `User` can own zero or more `Place`s (one-to-many).
+    *   A `User` can own zero or more `Place`s (composition relationship).
     *   A `Place` can offer zero or more `Amenity`s, and an `Amenity` can be offered by multiple `Place`s (many-to-many).
     *   A `User` can write zero or more `Review`s (one-to-many).
     *   A `Place` can have zero or more `Review`s (one-to-many).
 *   **Notes**:
     *   `BaseModel` is abstract.
     *   Users can be regular users or administrators.
-    *   Each Place is owned by one User.
+    *   Each Place is owned by one User (composition relationship).
     *   Reviews are linked to both a User (author) and a Place.
 
 ### 3. Fetch Places Diagram
@@ -198,7 +198,7 @@ This sequence diagram covers two related processes: a user submitting a review f
         *   If the review is found and updated successfully, `Database` returns success to `BusinessLogic`.
     5.  `BusinessLogic` informs `Presentation`, which returns a `200 OK` (Review successfully validated) to the `User`.
 
-    ## Authors
+## Authors
 - [Clément Gibot](https://github.com/clementgibot25)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/clementgibot25)
 - [Arnaud Tilawat](https://github.com/TilawatArnaud)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/TilawatArnaud)
 - [Maxime Naguet](https://github.com/Roupies)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/Roupies)
