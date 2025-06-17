@@ -1,14 +1,31 @@
 #!/usr/bin/python3
 
 from app.models.base_model import BaseModel
+from app.models.user import User
 
 class Place(BaseModel):
-    def __init__(self):
-        super().__init__()
-        self.title = None
-        self.description = None
-        self.price = None
-        self.latitude = None
-        self.longitude = None
-        self.owner = None
-        
+    def __init__(self,
+                title: str,
+                description: str,
+                price: float,
+                latitude: float,
+                longitude: float,
+                owner: User,
+                **kwargs):
+        super().__init__(**kwargs)
+        self.title = title
+        self.description = description
+        self.price = price
+        self.latitude = latitude
+        self.longitude = longitude
+        self.owner = owner
+        self.reviews = []
+        self.amenities = []
+
+    def add_review(self, review):
+        """Add a review to the place."""
+        self.reviews.append(review)
+
+    def add_amenity(self, amenity):
+        """Add an amenity to the place."""
+        self.amenities.append(amenity)

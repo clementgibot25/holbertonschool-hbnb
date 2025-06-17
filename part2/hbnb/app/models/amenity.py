@@ -3,6 +3,8 @@
 from app.models.base_model import BaseModel
 
 class Amenity(BaseModel):
-    def __init__(self):
-        super().__init__()
-        self.name = str
+    def __init__(self,
+                name: str,
+                **kwargs):
+        super().__init__(**kwargs)
+        self.name = name
