@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from app.models.base_model import BaseModel
-from app.models.user import User
+from typing import List, Optional
 
 class Place(BaseModel):
     def __init__(self,
@@ -10,7 +10,7 @@ class Place(BaseModel):
                 price: float,
                 latitude: float,
                 longitude: float,
-                owner: User,
+                owner_id: str,  # Utilisation de l'ID du propriétaire
                 **kwargs):
         super().__init__(**kwargs)
         self.title = title
@@ -18,14 +18,18 @@ class Place(BaseModel):
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
-        self.owner = owner
-        self.reviews = []
-        self.amenities = []
+        self.owner_id = owner_id  # Stockage de l'ID du propriétaire
+        self.reviews: List['Review'] = []
+        self.amenities: List['Amenity'] = []
 
-    def add_review(self, review):
-        """Add a review to the place."""
-        self.reviews.append(review)
+    def add_review(self, review: 'Review') -> None:
+        """Ajoute un avis à la place"""
+        if review not in self.reviews:
+            self.reviews.append(review)
+            if review.place_id != self.id:
+                review.place_id = self.id
 
-    def add_amenity(self, amenity):
-        """Add an amenity to the place."""
-        self.amenities.append(amenity)
+    def add_amenity(self, amenity: 'Amenity') -> None:
+        """Ajoute un équipement à la place"""
+        if amenity not in self.amenities:
+            self.amenities.append(amenity)
