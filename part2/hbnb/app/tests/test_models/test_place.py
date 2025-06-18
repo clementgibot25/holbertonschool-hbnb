@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Unit tests for the Place model and its relationships."""
+
 import unittest
 from app.models.place import Place
 from app.models.user import User

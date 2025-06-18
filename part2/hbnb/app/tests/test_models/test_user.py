@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Unit tests for the User model and authentication."""
+
 import unittest
 from app.models.user import User
 

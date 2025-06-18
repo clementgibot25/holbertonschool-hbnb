@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Unit tests for the Amenity model."""
+
 import unittest
 from app.models.amenity import Amenity
 
