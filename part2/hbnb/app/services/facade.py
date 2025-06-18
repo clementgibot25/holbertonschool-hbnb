@@ -75,6 +75,14 @@ class HBnBFacade:
         """
         return self.user_service.get_user(user_id)
     
+    def get_all_users(self) -> List[User]:
+        """Retrieve all users in the system.
+        
+        Returns:
+            A list of all User instances
+        """
+        return self.user_service.get_all_users()
+
     # Place methods
     def create_place(self, **kwargs) -> Place:
         """Create a new place.
@@ -140,6 +148,21 @@ class HBnBFacade:
             The User instance if found, None otherwise
         """
         return self.user_service.get_user_by_email(email)
+
+    def update_user(self, user_id: str, **updates) -> Optional[User]:
+        """Update a user's information.
+        
+        Args:
+            user_id: The ID of the user to update
+            **updates: Dictionary of fields to update
+            
+        Returns:
+            The updated User instance if successful, None if user not found
+            
+        Raises:
+            ValueError: If the update would result in a duplicate email
+        """
+        return self.user_service.update_user(user_id, **updates)
 
 # Singleton instance of the facade
 hbnb_facade = HBnBFacade()
