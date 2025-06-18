@@ -6,10 +6,10 @@ This module provides the ReviewService class which encapsulates all business log
 related to review management, including creation, retrieval, and updates.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from app.models.review import Review
-from app.persistence.repository import InMemoryRepository, Repository
-
+from app.persistence.repository import Repository
+from app.persistence.in_memory_repository import InMemoryRepository
 
 class ReviewService:
     """Service class for handling review-related operations.

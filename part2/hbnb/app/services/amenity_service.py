@@ -6,10 +6,10 @@ This module provides the AmenityService class which encapsulates all business lo
 related to amenity management, including creation, retrieval, and updates.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from app.models.amenity import Amenity
-from app.persistence.repository import InMemoryRepository, Repository
-
+from app.persistence.repository import Repository
+from app.persistence.in_memory_repository import InMemoryRepository
 
 class AmenityService:
     """Service class for handling amenity-related operations.

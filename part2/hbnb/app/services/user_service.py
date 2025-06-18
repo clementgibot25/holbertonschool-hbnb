@@ -8,8 +8,8 @@ related to user management, including creation, retrieval, and updates.
 
 from typing import List, Optional
 from app.models.user import User
-from app.persistence.repository import InMemoryRepository, Repository
-from app.persistence.in_memory_repository import T
+from app.persistence.repository import Repository
+from app.persistence.in_memory_repository import InMemoryRepository
 
 
 class UserService:

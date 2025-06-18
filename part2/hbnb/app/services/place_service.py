@@ -6,12 +6,12 @@ This module provides the PlaceService class which encapsulates all business logi
 related to place management, including creation, retrieval, and updates.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from app.models.place import Place
 from app.models.amenity import Amenity
 from app.models.review import Review
-from app.persistence.repository import InMemoryRepository, Repository
-
+from app.persistence.repository import Repository
+from app.persistence.in_memory_repository import InMemoryRepository
 
 class PlaceService:
     """Service class for handling place-related operations.
