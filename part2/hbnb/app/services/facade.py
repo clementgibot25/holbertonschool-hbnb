@@ -1,11 +1,14 @@
-# app/services/facade.py
-# Import service classes
+"""Facade module providing a unified interface to the HBnB application services.
+
+This module implements the Facade pattern to provide a simplified interface
+to the complex subsystem of services and repositories in the application.
+"""
+
+from typing import Dict, Optional, List
 from .user_service import UserService
 from .place_service import PlaceService
 from .review_service import ReviewService
 from .amenity_service import AmenityService
-# Import specific repository implementations
-from typing import Dict, Optional, List
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
@@ -14,28 +17,45 @@ from app.persistence.repository import InMemoryRepository
 
 
 class HBnBFacade:
-    """
-    Façade principale de l'application HBnB qui fournit une interface unifiée
-    pour accéder aux différentes fonctionnalités de l'application.
+    """Main facade for the HBnB application.
+    
+    This class provides a unified interface to access all the application's
+    functionality, abstracting away the complexity of the underlying services
+    and repositories.
     """
     
     def __init__(self):
-        # Initialisation des repositories
+        """Initialize the HBnB facade with all required services and repositories.
+        
+        Sets up in-memory repositories and initializes the corresponding services.
+        """
+        # Initialize repositories
         user_repo = InMemoryRepository()
         place_repo = InMemoryRepository()
         review_repo = InMemoryRepository()
         amenity_repo = InMemoryRepository()
         
-        # Initialisation des services avec leurs repositories respectifs
+        # Initialize services with their respective repositories
         self.user_service = UserService(user_repo)
         self.place_service = PlaceService(place_repo)
         self.review_service = ReviewService(review_repo)
         self.amenity_service = AmenityService(amenity_repo)
     
-    # Méthodes utilisateur
+    # User methods
     def create_user(self, email: str, password_hash: str, first_name: str, 
                    last_name: str, is_admin: bool = False) -> User:
-        """Crée un nouvel utilisateur"""
+        """Create a new user.
+        
+        Args:
+            email: User's email address (must be unique)
+            password_hash: Hashed password for security
+            first_name: User's first name
+            last_name: User's last name
+            is_admin: Whether the user has admin privileges
+            
+        Returns:
+            The newly created User instance
+        """
         return self.user_service.create_user(
             email=email,
             password_hash=password_hash,
@@ -45,32 +65,71 @@ class HBnBFacade:
         )
     
     def get_user(self, user_id: str) -> Optional[User]:
-        """Récupère un utilisateur par son ID"""
+        """Retrieve a user by their ID.
+        
+        Args:
+            user_id: The unique identifier of the user
+            
+        Returns:
+            The User instance if found, None otherwise
+        """
         return self.user_service.get_user(user_id)
     
-    # Méthodes de lieu
+    # Place methods
     def create_place(self, **kwargs) -> Place:
-        """Crée un nouveau lieu"""
+        """Create a new place.
+        
+        Args:
+            **kwargs: Keyword arguments for place creation
+            
+        Returns:
+            The newly created Place instance
+        """
         return self.place_service.create_place(**kwargs)
     
     def get_place(self, place_id: str) -> Optional[Place]:
-        """Récupère un lieu par son ID"""
+        """Retrieve a place by its ID.
+        
+        Args:
+            place_id: The unique identifier of the place
+            
+        Returns:
+            The Place instance if found, None otherwise
+        """
         return self.place_service.get_place(place_id)
     
-    # Méthodes d'avis
+    # Review methods
     def create_review(self, **kwargs) -> Review:
-        """Crée un nouvel avis"""
+        """Create a new review.
+        
+        Args:
+            **kwargs: Keyword arguments for review creation
+            
+        Returns:
+            The newly created Review instance
+        """
         return self.review_service.create_review(**kwargs)
     
-    # Méthodes de commodité
+    # Amenity methods
     def get_amenities(self) -> List[Amenity]:
-        """Récupère toutes les commodités"""
+        """Retrieve all amenities.
+        
+        Returns:
+            A list of all Amenity instances
+        """
         return self.amenity_service.get_all_amenities()
     
     def search_places(self, **filters) -> List[Place]:
-        """Recherche des lieux selon des critères"""
+        """Search for places based on filters.
+        
+        Args:
+            **filters: Keyword arguments for filtering places
+            
+        Returns:
+            A list of Place instances matching the filters
+        """
         return self.place_service.search_places(**filters)
 
 
-# Instance unique de la façade
+# Singleton instance of the facade
 hbnb_facade = HBnBFacade()
