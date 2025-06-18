@@ -89,17 +89,6 @@ class UserService:
             A list of all User instances
         """
         return self.repository.get_all()
-
-    def get_user_by_email(self, email):
-        """Retrieve a user by their email address.
-        
-        Args:
-            email: The email address to search for
-            
-        Returns:
-            The User instance if found, None otherwise
-        """
-        return self.repository.get_by_attribute('email', email)
     
     def update_user(self, user_id: str, **updates) -> Optional[User]:
         """Update a user's information.
