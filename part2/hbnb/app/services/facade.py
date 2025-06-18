@@ -130,6 +130,16 @@ class HBnBFacade:
         """
         return self.place_service.search_places(**filters)
 
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        """Retrieve a user by their email address.
+        
+        Args:
+            email: The email address to search for
+            
+        Returns:
+            The User instance if found, None otherwise
+        """
+        return self.user_service.get_user_by_email(email)
 
 # Singleton instance of the facade
 hbnb_facade = HBnBFacade()
