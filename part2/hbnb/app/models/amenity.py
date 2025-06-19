@@ -20,3 +20,14 @@ class Amenity(BaseModel):
         """
         super().__init__(**kwargs)
         self.name = name
+        
+    def to_dict(self):
+        """Return a dictionary representation of the Amenity instance.
+        
+        Returns:
+            dict: Dictionary containing the amenity's attributes
+        """
+        return {
+            'id': self.id,
+            'name': self.name
+        }
