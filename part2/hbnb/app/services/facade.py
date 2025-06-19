@@ -164,5 +164,53 @@ class HBnBFacade:
         """
         return self.user_service.update_user(user_id, **updates)
 
+    def create_amenity(self, amenity_data):
+        """Create a new amenity.
+    
+        Args:   
+            amenity_data: Dictionary containing amenity data with a 'name' key
+        
+        Returns:
+            The newly created Amenity instance
+        
+        Raises:
+            ValueError: If the name is invalid (handled by the service)
+        """
+        return self.amenity_service.create_amenity(amenity_data['name'])
+
+    def get_amenity(self, amenity_id):
+        """Retrieve an amenity by its ID.
+        
+        Args:
+            amenity_id: The unique identifier of the amenity
+            
+        Returns:
+            The Amenity instance if found, None otherwise
+        """
+        return self.amenity_service.get_amenity(amenity_id)
+
+    def get_all_amenities(self):
+        """Retrieve all amenities.
+        
+        Returns:
+            A list of all Amenity instances
+        """
+        return self.amenity_service.get_all_amenities()
+
+    def update_amenity(self, amenity_id, **amenity_data):
+        """Update an amenity's information.
+        
+        Args:
+            amenity_id: The ID of the amenity to update
+            **amenity_data: Keyword arguments containing amenity data to update
+            
+        Returns:
+            The updated Amenity instance if successful, None if amenity not found
+            
+        Raises:
+            ValueError: If the update would result in a duplicate name
+        """
+        return self.amenity_service.update_amenity(amenity_id, **amenity_data)
+
 # Singleton instance of the facade
 hbnb_facade = HBnBFacade()
