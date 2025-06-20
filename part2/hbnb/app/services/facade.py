@@ -42,23 +42,23 @@ class HBnBFacade:
         self.amenity_service = AmenityService(amenity_repo)
     
     # User methods
-    def create_user(self, email: str, password_hash: str, first_name: str, 
-                   last_name: str, is_admin: bool = False) -> User:
-        """Create a new user.
+    def create_user(self, email: str, first_name: str, last_name: str, is_admin: bool = False) -> User:
+        """Create a new user with the provided information.
         
         Args:
-            email: User's email address (must be unique)
-            password_hash: Hashed password for security
-            first_name: User's first name
-            last_name: User's last name
-            is_admin: Whether the user has admin privileges
+            email: The user's email address (must be unique)
+            first_name: The user's first name
+            last_name: The user's last name
+            is_admin: Whether the user should have admin privileges
             
         Returns:
             The newly created User instance
+            
+        Raises:
+            ValueError: If a user with the given email already exists
         """
         return self.user_service.create_user(
             email=email,
-            password_hash=password_hash,
             first_name=first_name,
             last_name=last_name,
             is_admin=is_admin
@@ -201,6 +201,8 @@ class HBnBFacade:
             The User instance if found, None otherwise
         """
         return self.user_service.get_user_by_email(email)
+
+
 
     def update_user(self, user_id: str, **updates) -> Optional[User]:
         """Update a user's information.

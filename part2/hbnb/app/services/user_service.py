@@ -28,13 +28,11 @@ class UserService:
         """
         self.repository = repository or InMemoryRepository()
     
-    def create_user(self, email: str, password_hash: str, first_name: str, 
-                   last_name: str, is_admin: bool = False) -> User:
+    def create_user(self, email: str, first_name: str, last_name: str, is_admin: bool = False) -> User:
         """Create a new user with the provided information.
         
         Args:
             email: The user's email address (must be unique)
-            password_hash: Hashed password for the user
             first_name: The user's first name
             last_name: The user's last name
             is_admin: Whether the user should have admin privileges
@@ -50,7 +48,6 @@ class UserService:
         
         user = User(
             email=email,
-            password_hash=password_hash,
             first_name=first_name,
             last_name=last_name,
             is_admin=is_admin
@@ -124,20 +121,7 @@ class UserService:
             return True
         return False
     
-    def authenticate(self, email: str, password_hash: str) -> Optional[User]:
-        """Authenticate a user with the provided email and password hash.
-        
-        Args:
-            email: The user's email address
-            password_hash: The hashed password to verify
-            
-        Returns:
-            The User instance if authentication is successful, None otherwise
-        """
-        user = self.get_user_by_email(email)
-        if user and user.password_hash == password_hash:
-            return user
-        return None
+
     
     def add_user_place(self, user_id: str, place_id: str) -> bool:
         """Add a place to the user's list of properties.
