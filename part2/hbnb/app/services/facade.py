@@ -117,6 +117,59 @@ class HBnBFacade:
             The newly created Review instance
         """
         return self.review_service.create_review(**kwargs)
+
+    def get_review(self, review_id: str) -> Optional[Review]:
+        """Retrieve a review by its ID.
+        
+        Args:
+            review_id: The unique identifier of the review
+            
+        Returns:
+            The Review instance if found, None otherwise
+        """
+        return self.review_service.get_review(review_id)
+    
+    def get_all_reviews(self) -> List[Review]:
+        """Retrieve all reviews in the system.
+        
+        Returns:
+            A list of all Review instances
+        """
+        return self.review_service.get_all_reviews()
+    
+    def update_review(self, review_id: str, **updates) -> Optional[Review]:
+        """Update a review's information.
+        
+        Args:
+            review_id: The ID of the review to update
+            **updates: Dictionary of fields to update
+            
+        Returns:
+            The updated Review instance if successful, None if review not found
+        """
+        return self.review_service.update_review(review_id, **updates)
+    
+    def delete_review(self, review_id: str) -> bool:
+        """Delete a review from the system.
+        
+        Args:
+            review_id: The ID of the review to delete
+            
+        Returns:
+            True if the review was deleted, False if not found
+        """
+        return self.review_service.delete_review(review_id)
+
+    def get_reviews_by_place(self, place_id: str) -> List[Review]:
+        """Retrieve all reviews for a specific place.
+        
+        Args:
+            place_id: The unique identifier of the place
+            
+        Returns:
+            A list of Review instances matching the place ID
+        """
+        return self.review_service.get_reviews_by_place(place_id)
     
     # Amenity methods
     def get_amenities(self) -> List[Amenity]:
