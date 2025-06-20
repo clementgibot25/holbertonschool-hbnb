@@ -38,7 +38,12 @@ class HBnBFacade:
         # Initialize services with their respective repositories
         self.user_service = UserService(user_repo)
         self.place_service = PlaceService(place_repo)
-        self.review_service = ReviewService(review_repo)
+        # Pass both user_service and place_service to review_service for validation
+        self.review_service = ReviewService(
+            repository=review_repo,
+            user_service=self.user_service,
+            place_service=self.place_service
+        )
         self.amenity_service = AmenityService(amenity_repo)
     
     # User methods

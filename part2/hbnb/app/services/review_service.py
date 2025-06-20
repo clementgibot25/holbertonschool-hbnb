@@ -7,6 +7,8 @@ related to review management, including creation, retrieval, and updates.
 """
 
 from typing import List, Optional
+from flask_restx import abort
+from http import HTTPStatus
 from app.models.review import Review
 from app.persistence.repository import Repository
 from app.persistence.in_memory_repository import InMemoryRepository
@@ -18,17 +20,45 @@ class ReviewService:
     reviews, as well as querying reviews by place or user.
     """
     
-    def __init__(self, repository: Repository = None):
-        """Initialize the ReviewService with a repository.
+    def __init__(self, repository: Repository = None, user_service=None, place_service=None):
+        """Initialize the ReviewService with a repository and optional dependencies.
         
         Args:
             repository: The repository to use for data access. If not provided,
                      an InMemoryRepository will be used by default.
+            user_service: Service for user-related operations
+            place_service: Service for place-related operations
         """
         self.repository = repository or InMemoryRepository()
+        self.user_service = user_service
+        self.place_service = place_service
+        
+    def _validate_user_exists(self, user_id: str) -> None:
+        """Check if a user with the given ID exists.
+        
+        Args:
+            user_id: The ID of the user to check
+            
+        Raises:
+            HTTPException: 404 if user doesn't exist
+        """
+        if self.user_service and not self.user_service.get_user(user_id):
+            abort(HTTPStatus.NOT_FOUND, f"User with id {user_id} does not exist")
+    
+    def _validate_place_exists(self, place_id: str) -> None:
+        """Check if a place with the given ID exists.
+        
+        Args:
+            place_id: The ID of the place to check
+            
+        Raises:
+            HTTPException: 404 if place doesn't exist
+        """
+        if self.place_service and not self.place_service.get_place(place_id):
+            abort(HTTPStatus.NOT_FOUND, f"Place with id {place_id} does not exist")
     
     def create_review(self, text: str, rating: int, 
-                     place_id: str, user_id: str) -> Review:
+                     place_id: str, user_id: str) -> Optional[Review]:
         """Create a new review with the provided information.
         
         Args:
@@ -38,8 +68,19 @@ class ReviewService:
             user_id: The ID of the user writing the review
             
         Returns:
-            The newly created Review instance
+            The newly created Review instance, or None if validation fails
+            
+        Raises:
+            ValueError: If user_id or place_id doesn't exist
         """
+        # Validate user and place exist
+        self._validate_user_exists(user_id)
+        self._validate_place_exists(place_id)
+            
+        # Validate rating is between 1 and 5
+        if not 1 <= rating <= 5:
+            abort(HTTPStatus.BAD_REQUEST, "Rating must be between 1 and 5")
+            
         review = Review(
             text=text,
             rating=rating,
@@ -101,7 +142,22 @@ class ReviewService:
             
         Returns:
             The updated Review instance if successful, None if review not found
+            
+        Raises:
+            HTTPException: With appropriate status code if validation fails
         """
+        # Check if user_id is being updated and validate it exists
+        if 'user_id' in updates:
+            self._validate_user_exists(updates['user_id'])
+            
+        # Check if place_id is being updated and validate it exists
+        if 'place_id' in updates:
+            self._validate_place_exists(updates['place_id'])
+            
+        # Validate rating is between 1 and 5 if being updated
+        if 'rating' in updates and not 1 <= updates['rating'] <= 5:
+            abort(HTTPStatus.BAD_REQUEST, "Rating must be between 1 and 5")
+            
         return self.repository.update(review_id, updates)
     
     def delete_review(self, review_id: str) -> bool:
