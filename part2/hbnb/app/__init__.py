@@ -9,12 +9,15 @@ def create_app():
     # Enable debug mode for better error messages
     app.config['DEBUG'] = True
     
-    # Initialize API
-    api = Api(app, version='1.0', title='HBnB API', 
-              description='HBnB Application API', 
-              doc='/api/v1/')
+    # Initialize API with Swagger at root
+    api = Api(app, 
+             version='1.0', 
+             title='HBnB API', 
+             description='HBnB Application API',
+             doc='/'  # Serve Swagger UI at the root URL
+             )
 
-    # Register namespaces
+    # Register namespaces with their paths
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
     
