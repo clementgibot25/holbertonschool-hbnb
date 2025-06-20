@@ -41,12 +41,58 @@ class Place(BaseModel):
         super().__init__(**kwargs)
         self.title = title
         self.description = description
+        # Use property setters for validation
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
         self.owner_id = owner_id
         self.reviews: List['Review'] = []
         self.amenities: List['Amenity'] = []
+
+    # --------------------
+    # Property validations
+    # --------------------
+    @property
+    def price(self) -> float:
+        return self._price
+
+    @price.setter
+    def price(self, value: float):
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            raise ValueError("price must be a number")
+        if value < 0:
+            raise ValueError("price must be non-negative")
+        self._price = value
+
+    @property
+    def latitude(self) -> float:
+        return self._latitude
+
+    @latitude.setter
+    def latitude(self, value: float):
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            raise ValueError("latitude must be a number")
+        if not -90 <= value <= 90:
+            raise ValueError("latitude must be between -90 and 90")
+        self._latitude = value
+
+    @property
+    def longitude(self) -> float:
+        return self._longitude
+
+    @longitude.setter
+    def longitude(self, value: float):
+        try:
+            value = float(value)
+        except (TypeError, ValueError):
+            raise ValueError("longitude must be a number")
+        if not -180 <= value <= 180:
+            raise ValueError("longitude must be between -180 and 180")
+        self._longitude = value
 
     def add_review(self, review: 'Review') -> None:
         """Add a review to this place.

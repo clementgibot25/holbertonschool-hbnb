@@ -28,6 +28,7 @@ if __name__ == '__main__':
     print(f"  📱 Swagger UI:    {display_url}/")
     print(f"  👤 Users API:     {display_url}/api/v1/users")
     print(f"  🏠 Amenities API: {display_url}/api/v1/amenities")
+    print(f"  📍 Places API:    {display_url}/api/v1/places")
     print(f"  🏠 Reviews API: {display_url}/api/v1/reviews")
     
     print("\n⚙️  Configuration:")

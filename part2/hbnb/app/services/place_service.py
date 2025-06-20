@@ -12,6 +12,7 @@ from app.models.amenity import Amenity
 from app.models.review import Review
 from app.persistence.repository import Repository
 from app.persistence.in_memory_repository import InMemoryRepository
+from app.services.user_service import user_service
 
 class PlaceService:
     """Service class for handling place-related operations.
@@ -58,7 +59,7 @@ class PlaceService:
         self.repository.add(place)
     
         # Update user's places list
-        from app.services import user_service
+        from app.services.user_service import user_service
         user_service.add_user_place(owner_id, place.id)
     
         return place
@@ -77,7 +78,7 @@ class PlaceService:
             return False
     
         # Clean up user references
-        from app.services import user_service
+        from app.services.user_service import user_service
         user = user_service.get_user(place.owner_id)
         if user and place_id in user.places:
             user.places.remove(place_id)
