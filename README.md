@@ -25,7 +25,7 @@ The first part of the project focuses on system design using UML diagrams. The f
 
 ## BM & API
 
-*To be implemented*
+The second part of the project implements the core API and business logic for a simplified AirBnB clone using Python, Flask, and Flask-RESTx. It is organized in a modular, scalable way to separate presentation, business, and persistence layers, and prepares for future extensions like database integration and authentication.
 
 ## Auth & API
 
