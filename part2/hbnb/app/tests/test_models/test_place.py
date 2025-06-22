@@ -52,7 +52,7 @@ class TestPlace(unittest.TestCase):
             user_id=self.owner.id
         )
         
-        self.place.add_review(review)
+        self.place.reviews.append(review)
         
         self.assertEqual(len(self.place.reviews), 1)
         self.assertEqual(self.place.reviews[0].text, "Great stay!")
@@ -62,7 +62,7 @@ class TestPlace(unittest.TestCase):
     def test_add_amenity(self):
         """Test adding an amenity to a place"""
         amenity = Amenity(name="Wi-Fi")
-        self.place.add_amenity(amenity)
+        self.place.amenities.append(amenity)
         
         self.assertEqual(len(self.place.amenities), 1)
         self.assertEqual(self.place.amenities[0].name, "Wi-Fi")

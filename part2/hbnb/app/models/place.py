@@ -93,23 +93,3 @@ class Place(BaseModel):
         if not -180 <= value <= 180:
             raise ValueError("longitude must be between -180 and 180")
         self._longitude = value
-
-    def add_review(self, review: 'Review') -> None:
-        """Add a review to this place.
-        
-        Args:
-            review (Review): Review instance to add
-        """
-        if review not in self.reviews:
-            self.reviews.append(review)
-            if review.place_id != self.id:
-                review.place_id = self.id
-
-    def add_amenity(self, amenity: 'Amenity') -> None:
-        """Add an amenity to this place.
-        
-        Args:
-            amenity (Amenity): Amenity instance to add
-        """
-        if amenity not in self.amenities:
-            self.amenities.append(amenity)
