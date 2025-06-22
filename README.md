@@ -32,7 +32,7 @@ The second part of the project implements the core API and business logic for a 
 - Auto-generated Swagger/OpenAPI documentation
 - Facade pattern for clean business logic orchestration
 
-🔗 [Go to Part 2](./part_2)
+🔗 [Go to Part 2](./part2/hbnb)
 
 ## Auth & API (Part 3)
 *To be implemented*
