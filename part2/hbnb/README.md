@@ -46,7 +46,8 @@ hbnb/
 ### 🎯 Layered Architecture
 
 - **🌐 API Layer** (`app/api/v1/`): RESTful endpoints with Flask-RESTx for automatic documentation
-- **🔧 Business Logic** (`app/services/`): Core business operations using the Facade pattern
+- **🏛️ Facade Layer** (`app/services/facade.py`): Unified interface orchestrating all business operations
+- **🔧 Business Logic** (`app/services/`): Core business operations and individual service classes
 - **📊 Models** (`app/models/`): Data models with validation and relationships
 - **💾 Persistence** (`app/persistence/`): Repository pattern with in-memory storage
 
@@ -105,10 +106,10 @@ The API will be available at:
 - **Auto-generated Documentation**: Interactive Swagger/OpenAPI docs
 
 ### API Endpoints Overview
-- `GET/POST /api/v1/users/` - User operations
-- `GET/POST /api/v1/places/` - Place operations
-- `GET/POST /api/v1/reviews/` - Review operations
-- `GET/POST /api/v1/amenities/` - Amenity operations
+- `GET/POST/PUT /api/v1/users/` - User management (create, read, update)
+- `GET/POST/PUT /api/v1/places/` - Place management (create, read, update)
+- `GET/POST/PUT/DELETE /api/v1/reviews/` - Review management (full CRUD operations)
+- `GET/POST/PUT /api/v1/amenities/` - Amenity management (create, read, update)
 
 ---
 
@@ -151,7 +152,6 @@ This implementation focuses on the **Presentation** and **Business Logic** layer
 ### Future Phases
 - 🔄 **Part 3**: Database integration with SQLAlchemy
 - 🔄 **Part 4**: JWT authentication and authorization
-- 🔄 **Part 5**: Advanced features and deployment
 
 ---
 
@@ -197,5 +197,3 @@ This project is part of the Holberton School curriculum.
 - [Maxime Naguet](https://github.com/Roupies)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/Roupies)
 
 ---
-
-*Built with ❤️ for Holberton School*
