@@ -16,7 +16,8 @@ def format_place_response(place):
         'price': place.price,
         'latitude': place.latitude,
         'longitude': place.longitude,
-        'owner_id': place.owner_id
+        'owner_id': place.owner_id,
+        'amenities': [a.id if hasattr(a, 'id') else a for a in getattr(place, 'amenities', [])]
     }
 
 api = Namespace('places', description='Place operations')
@@ -55,6 +56,12 @@ place_model = api.model('Place', {
         required=True,
         description='ID of the user who owns this place',
         example='user_12345'
+    ),
+    'amenities': fields.List(
+        fields.String,
+        required=False,
+        description="List of amenities ID's",
+        example=['wifi', 'tv', 'piscine']
     )
 })
 
@@ -65,7 +72,8 @@ place_response_model = api.model('PlaceResponse', {
     'price': fields.Float(description='Price per night'),
     'latitude': fields.Float(description='Latitude'),
     'longitude': fields.Float(description='Longitude'),
-    'owner_id': fields.String(description='Owner user ID')
+    'owner_id': fields.String(description='Owner user ID'),
+    'amenities': fields.List(fields.String, description="List of amenities ID's")
 })
 
 

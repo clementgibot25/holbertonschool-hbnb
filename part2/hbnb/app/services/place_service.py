@@ -49,7 +49,8 @@ class PlaceService:
             raise ValueError(f"User with id {user_id} does not exist")
 
     def create_place(self, title: str, description: str, price: float,
-                   latitude: float, longitude: float, owner_id: str) -> Optional[Place]:
+                   latitude: float, longitude: float, owner_id: str,
+                   amenities: List[str] = None) -> Optional[Place]:
         """Create a new place with the provided information.
         
         Args:
@@ -79,7 +80,8 @@ class PlaceService:
             owner_id=owner_id
         )
         place.reviews = []
-        place.amenities = []
+        # Attach amenity IDs (list of strings) if provided
+        place.amenities = amenities or []
     
         self.repository.add(place)
     
@@ -109,6 +111,7 @@ class PlaceService:
         return self.repository.get_all()
     
     def update_place(self, place_id: str, **updates) -> Optional[Place]:
+        # Allow amenities list update
         """Update a place's information.
         
         Args:
