@@ -48,6 +48,20 @@ class PlaceService:
         if not self.user_service.get_user(user_id):
             raise ValueError(f"User with id {user_id} does not exist")
 
+    def _validate_amenities_exist(self, amenity_ids: List[str]) -> None:
+        """Check if all amenity IDs in the list exist.
+        
+        Args:
+            amenity_ids: List of amenity IDs to validate
+            
+        Raises:
+            ValueError: If any amenity doesn't exist
+        """
+        from app.services.facade import hbnb_facade as facade
+        for amenity_id in amenity_ids:
+            if not facade.amenity_service.get_amenity(amenity_id):
+                raise ValueError(f"Amenity with id {amenity_id} does not exist")
+
     def create_place(self, title: str, description: str, price: float,
                    latitude: float, longitude: float, owner_id: str,
                    amenities: List[str] = None) -> Optional[Place]:
@@ -60,15 +74,20 @@ class PlaceService:
             latitude: The geographical latitude of the place
             longitude: The geographical longitude of the place
             owner_id: The ID of the user who owns this place
+            amenities: List of amenity IDs to associate with this place
             
         Returns:
             The newly created Place instance, or None if creation failed
             
         Raises:
-            ValueError: If the user doesn't exist or if input validation fails
+            ValueError: If the user or any amenity doesn't exist, or if input validation fails
         """
         # Validate user exists
         self._validate_user_exists(owner_id)
+        
+        # Validate amenities if provided
+        if amenities:
+            self._validate_amenities_exist(amenities)
 
         # Create the place
         place = Place(
@@ -80,7 +99,7 @@ class PlaceService:
             owner_id=owner_id
         )
         place.reviews = []
-        # Attach amenity IDs (list of strings) if provided
+        # Store the list of amenity IDs
         place.amenities = amenities or []
     
         self.repository.add(place)
@@ -111,7 +130,6 @@ class PlaceService:
         return self.repository.get_all()
     
     def update_place(self, place_id: str, **updates) -> Optional[Place]:
-        # Allow amenities list update
         """Update a place's information.
         
         Args:
@@ -120,8 +138,27 @@ class PlaceService:
             
         Returns:
             The updated Place instance if successful, None if place not found
+            
+        Raises:
+            ValueError: If any amenity doesn't exist or if validation fails
         """
-        return self.repository.update(place_id, updates)
+        # Validate amenities if they're being updated
+        if 'amenities' in updates:
+            self._validate_amenities_exist(updates['amenities'])
+            
+        # Get the current place to preserve existing fields
+        place = self.get_place(place_id)
+        if not place:
+            return None
+            
+        # Update the place attributes
+        for key, value in updates.items():
+            if hasattr(place, key):
+                setattr(place, key, value)
+                
+        # Save the updated place
+        self.repository.add(place)
+        return place
     
     def search_places(self, **filters) -> List[Place]:
         """Search for places based on filter criteria.
