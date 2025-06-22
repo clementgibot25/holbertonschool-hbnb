@@ -93,7 +93,7 @@ class PlaceList(Resource):
             new_place = facade.create_place(**data)
             return format_place_response(new_place), 201
         except ValueError as e:
-            abort(400, str(e) or 'Invalid input data')
+            abort(404, str(e))  # Gère à la fois les erreurs de prix négatif et d'utilisateur non trouvé
         except Exception:
             abort(500, 'An unexpected error occurred')
 
@@ -123,12 +123,4 @@ class PlaceResource(Resource):
             abort(404, 'Place not found')
         return format_place_response(place), 200
 
-    @api.response(204, 'Place deleted')
-    @api.response(404, 'Place not found')
-    def delete(self, place_id):
-        """Delete a place by ID."""
-        deleted = facade.place_service.delete_place(place_id)
-        if not deleted:
-            abort(404, 'Place not found')
-        return '', 204
 

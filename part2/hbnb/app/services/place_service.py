@@ -7,12 +7,16 @@ related to place management, including creation, retrieval, and updates.
 """
 
 from typing import List, Optional
+from http import HTTPStatus
+from flask_restx import abort
+
 from app.models.place import Place
 from app.models.amenity import Amenity
 from app.models.review import Review
+from app.models.user import User
 from app.persistence.repository import Repository
 from app.persistence.in_memory_repository import InMemoryRepository
-from app.services.user_service import user_service
+from app.services.user_service import user_service as global_user_service
 
 class PlaceService:
     """Service class for handling place-related operations.
@@ -21,15 +25,29 @@ class PlaceService:
     places, as well as managing place amenities and reviews.
     """
     
-    def __init__(self, repository: Repository = None):
-        """Initialize the PlaceService with a repository.
+    def __init__(self, repository: Repository = None, user_service=None):
+        """Initialize the PlaceService with a repository and services.
         
         Args:
             repository: The repository to use for data access. If not provided,
                      an InMemoryRepository will be used by default.
+            user_service: The user service to use for user-related operations.
         """
         self.repository = repository or InMemoryRepository()
+        self.user_service = user_service or global_user_service
     
+    def _validate_user_exists(self, user_id: str) -> None:
+        """Check if a user with the given ID exists.
+        
+        Args:
+            user_id: The ID of the user to check
+            
+        Raises:
+            ValueError: If user doesn't exist
+        """
+        if not self.user_service.get_user(user_id):
+            raise ValueError(f"User with id {user_id} does not exist")
+
     def create_place(self, title: str, description: str, price: float,
                    latitude: float, longitude: float, owner_id: str) -> Optional[Place]:
         """Create a new place with the provided information.
@@ -44,7 +62,14 @@ class PlaceService:
             
         Returns:
             The newly created Place instance, or None if creation failed
+            
+        Raises:
+            ValueError: If the user doesn't exist or if input validation fails
         """
+        # Validate user exists
+        self._validate_user_exists(owner_id)
+
+        # Create the place
         place = Place(
             title=title,
             description=description,
@@ -59,32 +84,10 @@ class PlaceService:
         self.repository.add(place)
     
         # Update user's places list
-        from app.services.user_service import user_service
-        user_service.add_user_place(owner_id, place.id)
+        self.user_service.add_user_place(owner_id, place.id)
     
         return place
     
-    def delete_place(self, place_id: str) -> bool:
-        """Delete a place and clean up related references.
-        
-        Args:
-            place_id: The ID of the place to delete
-            
-        Returns:
-            True if the place was deleted, False if not found
-        """
-        place = self.get_place(place_id)
-        if not place:
-            return False
-    
-        # Clean up user references
-        from app.services.user_service import user_service
-        user = user_service.get_user(place.owner_id)
-        if user and place_id in user.places:
-            user.places.remove(place_id)
-    
-        self.repository.delete(place_id)
-        return True
     
     def get_place(self, place_id: str) -> Optional[Place]:
         """Retrieve a place by its ID.
