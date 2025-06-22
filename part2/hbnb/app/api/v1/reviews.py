@@ -6,10 +6,24 @@ api = Namespace('reviews', description='Review operations')
 
 # Define the review model for input validation and documentation
 review_model = api.model('Review', {
-    'text': fields.String(required=True, description='Text of the review'),
-    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
-    'user_id': fields.String(required=True, description='ID of the user'), # à modifier pour que le user_id vienne de la session
-    'place_id': fields.String(required=True, description='ID of the place') # à modifier pour que le place_id vienne de la session
+    'text': fields.String(
+        required=True,
+        description='Text of the review',
+        example='The place was great!',
+        min_length=1,
+        max_length=1000,
+        pattern=r"^[a-zA-Zà-ÿÀ-Ÿ\s\-']+$",),
+    'rating': fields.Integer(required=True,
+        description='Rating of the place (1-5)',
+        example=5,
+        min=1,
+        max=5),
+    'user_id': fields.String(required=True,
+        description='ID of the user',
+        example='user_12345'),
+    'place_id': fields.String(required=True,
+        description='ID of the place',
+        example='place_12345')
 })
 
 @api.route('/')
