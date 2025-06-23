@@ -1,7 +1,6 @@
 <img src="Header_banner.jpeg" alt="Header Banner" width="600"/>
 
 # HBNB - Holberton BnB
-
 Welcome to the HBNB project, a full-stack web application that allows users to rent places for short periods of time, similar to Airbnb. This project is developed as part of the Holberton School curriculum.
 
 ## Table of Contents
@@ -11,7 +10,6 @@ Welcome to the HBNB project, a full-stack web application that allows users to r
 4. [Web interface](./part_4)
 
 ## UML Diagrams (Part 1 - Completed)
-
 The first part of the project focuses on system design using UML diagrams. The following diagrams are included in the `part_1` directory:
 
 - **Package Diagram**: A package diagram showing the structural organization of the HBNB application at a global level.
@@ -23,16 +21,23 @@ The first part of the project focuses on system design using UML diagrams. The f
 
 🔗 [Go to Part 1](./part_1)
 
-## BM & API
-
+## BM & API (Part 2 - Completed)
 The second part of the project implements the core API and business logic for a simplified AirBnB clone using Python, Flask, and Flask-RESTx. It is organized in a modular, scalable way to separate presentation, business, and persistence layers, and prepares for future extensions like database integration and authentication.
 
-## Auth & API
+**Key Features:**
+- RESTful API endpoints for Users, Places, Reviews, and Amenities
+- Modular architecture with clear separation of concerns
+- In-memory data persistence with repository pattern
+- Comprehensive input validation and error handling
+- Auto-generated Swagger/OpenAPI documentation
+- Facade pattern for clean business logic orchestration
 
+🔗 [Go to Part 2](./part2)
+
+## Auth & API (Part 3)
 *To be implemented*
 
-## Web interface
-
+## Web interface (Part 4)
 *To be implemented*
 
 ## Authors
