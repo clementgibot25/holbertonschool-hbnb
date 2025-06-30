@@ -52,6 +52,7 @@ user_response_model = api.model('UserResponse', {
     'first_name': fields.String(description='User first name'),
     'last_name': fields.String(description='User last name'),
     'email': fields.String(description='User email address')
+    # Password volontairement omis pour la sécurité
 })
 
 # Registration response model
@@ -91,6 +92,9 @@ class UserList(Resource):
             data = api.payload
             # Hash the password before creating the user
             password_hash = User.hash_password(data['password'])
+            
+            # 🔒 Sécurité : Supprimer le password plain text de la mémoire
+            data.pop('password', None)
             
             # Create user with hashed password
             new_user = facade.create_user(
