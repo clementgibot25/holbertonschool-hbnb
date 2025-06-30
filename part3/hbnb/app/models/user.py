@@ -3,7 +3,6 @@
 """Defines the User model for the application."""
 
 from app.models.base_model import BaseModel
-from app import bcrypt
 
 class User(BaseModel):
     """Represents a user in the application.
@@ -38,6 +37,7 @@ class User(BaseModel):
 
     def hash_password(self, password: str) -> None:
         """Hashes the password before storing it."""
+        from app import bcrypt
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password: str) -> bool:
