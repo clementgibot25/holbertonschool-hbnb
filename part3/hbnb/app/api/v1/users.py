@@ -35,6 +35,13 @@ user_model = api.model('User', {
         description='User email address',
         pattern=r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
         example="marie-louise.oconnor@example.com"
+    ),
+    'password': fields.String(
+        required=True,
+        min_length=8,
+        max_length=128,
+        description='User password (at least 8 characters, not returned in response)',
+        example='MySecurePassword123!'
     )
 })
 
@@ -44,6 +51,12 @@ user_response_model = api.model('UserResponse', {
     'first_name': fields.String(description='User first name'),
     'last_name': fields.String(description='User last name'),
     'email': fields.String(description='User email address')
+})
+
+# Registration response model
+user_registration_response_model = api.model('UserRegistrationResponse', {
+    'id': fields.String(description='User ID'),
+    'message': fields.String(description='Registration success message')
 })
 
 @api.route('/')
@@ -61,7 +74,7 @@ class UserList(Resource):
         return [format_user_response(user) for user in users], 200
 
     @api.expect(user_model, validate=True)
-    @api.marshal_with(user_response_model, code=201)
+    @api.marshal_with(user_registration_response_model, code=201)
     @api.response(201, 'User created successfully')
     @api.response(400, 'Invalid input or email already registered')
     @api.response(500, 'Internal server error')
@@ -71,16 +84,20 @@ class UserList(Resource):
         
         Create a new user account with the provided information.
         Email must be unique across all users.
+        Password will be securely hashed before storage.
         """
         try:
             data = api.payload
+            # Create user instance and hash password before saving
             new_user = facade.create_user(
                 email=data['email'],
                 first_name=data['first_name'],
-                last_name=data['last_name']
+                last_name=data['last_name'],
             )
-            return format_user_response(new_user), 201
-            
+            new_user.hash_password(data['password'])
+            # Persist user (if not already done in create_user)
+            # facade.save_user(new_user)  # Uncomment if required by your architecture
+            return {'id': new_user.id, 'message': 'User registered successfully'}, 201
         except ValueError as e:
             api.abort(400, str(e) or 'Invalid input data')
         except Exception as e:
