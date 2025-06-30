@@ -11,35 +11,52 @@ class User(BaseModel):
         email (str): The user's email address (must be unique)
         first_name (str): The user's first name
         last_name (str): The user's last name
+        password (str): The user's hashed password
         is_admin (bool): Whether the user has admin privileges
         places (list): List of place IDs owned by this user
     """
     
     def __init__(self, email: str, first_name: str, last_name: str, 
-                 is_admin: bool = False, password: str = None, **kwargs):
+                 password: str, is_admin: bool = False, **kwargs):
         """Initialize a new User instance.
         
         Args:
             email: The user's email address
             first_name: The user's first name
             last_name: The user's last name
+            password: The user's hashed password (should be pre-hashed)
             is_admin: Whether the user has admin privileges
-            password: The user's password (not stored directly)
             **kwargs: Additional attributes from BaseModel
         """
         super().__init__(**kwargs)
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
+        self.password = password  # Already hashed password
         self.is_admin = is_admin
-        self.password = password
-        self.places = []
+        self.places = []  # List of place IDs owned by this user
 
-    def hash_password(self, password: str) -> None:
-        """Hashes the password before storing it."""
+    @staticmethod
+    def hash_password(password: str) -> str:
+        """Hash a password using Flask-Bcrypt.
+        
+        Args:
+            password: Plain text password to hash
+            
+        Returns:
+            Hashed password as string
+        """
         from app import bcrypt
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        return bcrypt.generate_password_hash(password).decode('utf-8')
 
-    def verify_password(self, password: str) -> bool:
-        """Verifies if the provided password matches the hashed password."""
+    def check_password(self, password: str) -> bool:
+        """Check if the provided password matches the stored hash.
+        
+        Args:
+            password: Plain text password to verify
+            
+        Returns:
+            True if password matches, False otherwise
+        """
+        from app import bcrypt
         return bcrypt.check_password_hash(self.password, password)
