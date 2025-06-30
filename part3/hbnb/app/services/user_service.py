@@ -28,13 +28,14 @@ class UserService:
         """
         self.repository = repository or InMemoryRepository()
     
-    def create_user(self, email: str, first_name: str, last_name: str, is_admin: bool = False) -> User:
+    def create_user(self, email: str, first_name: str, last_name: str, password: str, is_admin: bool = False) -> User:
         """Create a new user with the provided information.
         
         Args:
             email: The user's email address (must be unique)
             first_name: The user's first name
             last_name: The user's last name
+            password: The user's password
             is_admin: Whether the user should have admin privileges
             
         Returns:
@@ -50,6 +51,7 @@ class UserService:
             email=email,
             first_name=first_name,
             last_name=last_name,
+            password=password,
             is_admin=is_admin
         )
         

@@ -53,7 +53,7 @@ class HBnBFacade:
         self.amenity_service = AmenityService(amenity_repo)
     
     # User methods
-    def create_user(self, email: str, first_name: str, last_name: str, is_admin: bool = False) -> User:
+    def create_user(self, email: str, first_name: str, last_name: str, password: str, is_admin: bool = False) -> User:
         """Create a new user with the provided information.
         
         Args:
@@ -72,6 +72,7 @@ class HBnBFacade:
             email=email,
             first_name=first_name,
             last_name=last_name,
+            password=password,
             is_admin=is_admin
         )
     
