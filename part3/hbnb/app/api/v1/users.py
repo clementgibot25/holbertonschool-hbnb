@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services.facade import hbnb_facade as facade
+from app.models.user import User
 
 def format_user_response(user):
     """Format standard pour les réponses utilisateur"""
@@ -88,13 +89,16 @@ class UserList(Resource):
         """
         try:
             data = api.payload
-            # Create user instance and hash password before saving
+            # Hash the password before creating the user
+            password_hash = User.hash_password(data['password'])
+            
+            # Create user with hashed password
             new_user = facade.create_user(
                 email=data['email'],
                 first_name=data['first_name'],
                 last_name=data['last_name'],
+                password=password_hash
             )
-            new_user.hash_password(data['password'])
             # Persist user (if not already done in create_user)
             # facade.save_user(new_user)  # Uncomment if required by your architecture
             return {'id': new_user.id, 'message': 'User registered successfully'}, 201
