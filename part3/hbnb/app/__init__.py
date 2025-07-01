@@ -15,12 +15,21 @@ def create_app(config_class="config.DevelopmentConfig"):
     # Enable debug mode for better error messages
     app.config['DEBUG'] = True
     
-    # Initialize API with Swagger at root
+    # Initialize API with Swagger at root + JWT Authorization
     api = Api(app, 
              version='1.0', 
              title='HBnB API', 
              description='HBnB Application API',
-             doc='/'  # Serve Swagger UI at the root URL
+             doc='/',  # Serve Swagger UI at the root URL
+             authorizations={
+                 'Bearer': {
+                     'type': 'apiKey',
+                     'in': 'header',
+                     'name': 'Authorization',
+                     'description': 'JWT token (prefix with "Bearer ")'
+                 }
+             },
+             security='Bearer'  # Set default security for all endpoints
              )
 
     # Register namespaces with their paths
