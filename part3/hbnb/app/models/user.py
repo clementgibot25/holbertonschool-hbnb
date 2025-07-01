@@ -49,7 +49,7 @@ class User(BaseModel):
         from app import bcrypt
         return bcrypt.generate_password_hash(password).decode('utf-8')
 
-    def check_password(self, password: str) -> bool:
+    def verify_password(self, password: str) -> bool:
         """Check if the provided password matches the stored hash.
         
         Args:
