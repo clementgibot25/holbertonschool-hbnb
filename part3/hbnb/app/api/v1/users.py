@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services.facade import hbnb_facade as facade
 from app.models.user import User
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 def format_user_response(user):
     """Format standard pour les réponses utilisateur"""
@@ -134,6 +135,7 @@ class UserResource(Resource):
     @api.response(200, 'User successfully updated')
     @api.response(400, 'Email already registered')
     @api.response(404, 'User not found')
+    @jwt_required()
     def put(self, user_id):
         """
         Update an existing user
@@ -144,15 +146,26 @@ class UserResource(Resource):
         Note: Only the fields included in the request will be updated.
         Other fields will remain unchanged.
         """
+        current_user_id = get_jwt_identity()
+        
+        # Vérifier que l'utilisateur modifie son propre compte
+        if current_user_id != user_id:
+            api.abort(403, 'Unauthorized action')
+            
         user_data = api.payload
         
-        # Check if user exists
+        # Vérifier si l'utilisateur essaie de modifier l'email ou le mot de passe
+        if ('email' in user_data and user_data['email'] != facade.get_user(user_id).email) or \
+           ('password' in user_data and user_data['password'] != facade.get_user(user_id).password):
+            api.abort(400, 'You cannot modify email or password')
+        
+        # Vérifier si l'utilisateur existe
         user = facade.get_user(user_id)
         if not user:
             api.abort(404, 'User not found')
             
-        # Check if email is modified and already exists
-        if 'email' in user_data and user_data['email'] != user.email:
+        # Vérifier si l'email est modifié et existe déjà
+        if 'email' in user_data and user_data['email'] != facade.get_user(user_id).email:
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user and existing_user.id != user_id:
                 api.abort(400, 'Email already registered')
