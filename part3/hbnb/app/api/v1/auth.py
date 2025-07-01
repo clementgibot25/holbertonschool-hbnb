@@ -26,8 +26,8 @@ class Login(Resource):
         if not user or not user.verify_password(credentials['password']):
             return {'error': 'Invalid credentials'}, 401
 
-        # Step 3: Create a JWT token with the user's id and is_admin flag
-        access_token = create_access_token(identity={'id': str(user.id), 'is_admin': user.is_admin})
+        # Step 3: Create a JWT token with just the user's id
+        access_token = create_access_token(identity=str(user.id))
         
         # Step 4: Return the JWT token to the client
         return {'access_token': access_token}, 200
@@ -37,5 +37,5 @@ class ProtectedResource(Resource):
     @jwt_required()
     def get(self):
         """A protected endpoint that requires a valid JWT token"""
-        current_user = get_jwt_identity()  # Retrieve the user's identity from the token
-        return {'message': f'Hello, user {current_user["id"]}'}, 200
+        current_user_id = get_jwt_identity()  # Retrieve the user's ID from the token
+        return {'message': f'Hello, user {current_user_id}'}, 200
