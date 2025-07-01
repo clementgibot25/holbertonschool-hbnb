@@ -47,6 +47,26 @@ user_model = api.model('User', {
     )
 })
 
+# User update model - only modifiable fields
+user_update_model = api.model('UserUpdate', {
+    'first_name': fields.String(
+        required=True,
+        min_length=1,
+        max_length=50,
+        pattern=r"^[a-zA-Zà-ÿÀ-Ÿ\s\-']+$",
+        description="User first name (letters, accents, spaces, hyphens and apostrophes only)",
+        example='Marie-Louise'
+    ),
+    'last_name': fields.String(
+        required=True,
+        min_length=1,
+        max_length=50,
+        pattern=r"^[a-zA-Zà-ÿÀ-Ÿ\s\-']+$",
+        description="User last name (letters, accents, spaces, hyphens and apostrophes only)",
+        example="O'Connor"
+    )
+})
+
 # User response model for response documentation
 user_response_model = api.model('UserResponse', {
     'id': fields.String(description='User ID'),
@@ -77,7 +97,7 @@ class UserList(Resource):
         return [format_user_response(user) for user in users], 200
 
     @api.expect(user_model, validate=True)
-    @api.marshal_with(user_registration_response_model, code=201)
+    @api.marshal_with(user_registration_response_model)
     @api.response(201, 'User created successfully')
     @api.response(400, 'Invalid input or email already registered')
     @api.response(500, 'Internal server error')
@@ -130,21 +150,19 @@ class UserResource(Resource):
             api.abort(404, 'User not found')
         return format_user_response(user), 200
         
-    @api.expect(user_model, validate=True)
+    @api.expect(user_update_model, validate=True)
     @api.marshal_with(user_response_model)
     @api.response(200, 'User successfully updated')
-    @api.response(400, 'Email already registered')
+    @api.response(400, 'You cannot modify email or password.')
+    @api.response(403, 'Unauthorized action')
     @api.response(404, 'User not found')
     @jwt_required()
     def put(self, user_id):
         """
         Update an existing user
         
-        Update user information with the provided fields.
-        If the email is being updated, it must remain unique across all users.
-        
-        Note: Only the fields included in the request will be updated.
-        Other fields will remain unchanged.
+        Update user information. Only first_name and last_name can be modified.
+        Email and password modifications are not allowed.
         """
         current_user_id = get_jwt_identity()
         
@@ -152,23 +170,21 @@ class UserResource(Resource):
         if current_user_id != user_id:
             api.abort(403, 'Unauthorized action')
             
-        user_data = api.payload
-        
-        # Vérifier si l'utilisateur essaie de modifier l'email ou le mot de passe
-        if ('email' in user_data and user_data['email'] != facade.get_user(user_id).email) or \
-           ('password' in user_data and user_data['password'] != facade.get_user(user_id).password):
-            api.abort(400, 'You cannot modify email or password')
-        
-        # Vérifier si l'utilisateur existe
+        # Récupérer l'utilisateur existant
         user = facade.get_user(user_id)
         if not user:
             api.abort(404, 'User not found')
             
-        # Vérifier si l'email est modifié et existe déjà
-        if 'email' in user_data and user_data['email'] != facade.get_user(user_id).email:
-            existing_user = facade.get_user_by_email(user_data['email'])
-            if existing_user and existing_user.id != user_id:
-                api.abort(400, 'Email already registered')
-                
-        updated_user = facade.update_user(user_id, **user_data)
-        return format_user_response(updated_user), 200
+        user_data = api.payload
+        
+        # Vérification de sécurité : s'assurer qu'aucun champ interdit n'est présent
+        forbidden_fields = ['email', 'password', 'id', 'is_admin']
+        for field in forbidden_fields:
+            if field in user_data:
+                api.abort(400, 'You cannot modify email or password.')
+        
+        try:
+            updated_user = facade.update_user(user_id, **user_data)
+            return format_user_response(updated_user), 200
+        except ValueError as e:
+            api.abort(400, str(e))
