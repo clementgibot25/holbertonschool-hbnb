@@ -5,6 +5,7 @@
 from flask_restx import Namespace, Resource, fields, abort
 from flask import request
 from app.services.facade import hbnb_facade as facade
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 def format_place_response(place, include_owner: bool = False):
@@ -166,6 +167,7 @@ class PlaceList(Resource):
     @api.response(201, 'Place registered successfully')
     @api.response(400, 'Invalid input')
     @api.response(500, 'Internal server error')
+    @jwt_required()
     def post(self):
         """
         Register a new place
@@ -208,6 +210,7 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'Place not found')
+    @jwt_required()
     def put(self, place_id):
         """
         Update an existing place
@@ -219,4 +222,6 @@ class PlaceResource(Resource):
         place = facade.place_service.update_place(place_id, **updates)
         if not place:
             abort(404, 'Place not found')
+        if place.owner_id != get_jwt_identity():
+            abort(403, 'You are not authorized to update this place')
         return {'message': 'Place updated successfully'}, 200
