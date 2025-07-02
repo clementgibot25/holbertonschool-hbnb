@@ -1,7 +1,11 @@
-from flask_restx import Namespace, Resource, fields
+from re import I
+from flask_restx import Namespace, Resource
 from app.services.facade import hbnb_facade as facade
 from app.models.user import User
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from flask import request
+from flask_restx import fields
+
 
 def format_user_response(user):
     """Format standard pour les réponses utilisateur"""
@@ -96,42 +100,6 @@ class UserList(Resource):
         users = facade.get_all_users()
         return [format_user_response(user) for user in users], 200
 
-    @api.expect(user_model, validate=True)
-    @api.marshal_with(user_registration_response_model)
-    @api.response(201, 'User created successfully')
-    @api.response(400, 'Invalid input or email already registered')
-    @api.response(500, 'Internal server error')
-    def post(self):
-        """
-        Register a new user
-        
-        Create a new user account with the provided information.
-        Email must be unique across all users.
-        Password will be securely hashed before storage.
-        """
-        try:
-            data = api.payload
-            # Hash the password before creating the user
-            password_hash = User.hash_password(data['password'])
-            
-            # 🔒 Sécurité : Supprimer le password plain text de la mémoire
-            data.pop('password', None)
-            
-            # Create user with hashed password
-            new_user = facade.create_user(
-                email=data['email'],
-                first_name=data['first_name'],
-                last_name=data['last_name'],
-                password=password_hash
-            )
-            # Persist user (if not already done in create_user)
-            # facade.save_user(new_user)  # Uncomment if required by your architecture
-            return {'id': new_user.id, 'message': 'User registered successfully'}, 201
-        except ValueError as e:
-            api.abort(400, str(e) or 'Invalid input data')
-        except Exception as e:
-            api.abort(500, 'An unexpected error occurred')
-
 
 @api.route('/<user_id>')
 class UserResource(Resource):
@@ -188,3 +156,87 @@ class UserResource(Resource):
             return format_user_response(updated_user), 200
         except ValueError as e:
             api.abort(400, str(e))
+
+@api.route('/users/<user_id>')
+class AdminUserModify(Resource):
+    @jwt_required()
+    @api.expect(user_update_model, validate=True)
+    @api.marshal_with(user_response_model)
+    @api.response(200, 'User successfully updated')
+    @api.response(400, 'You cannot modify email or password.')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'User not found')
+    def put(self, user_id):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        data = api.payload
+        email = data.get('email')
+
+        # Ensure email uniqueness
+        if email:
+            existing_user = facade.get_user_by_email(email)
+            if existing_user and existing_user.id != user_id:
+                return {'error': 'Email already in use'}, 400
+
+        # Logic to update user details
+        current_user_id = get_jwt_identity()
+        
+        # Vérifier que l'utilisateur modifie son propre compte
+        if current_user_id != user_id:
+            api.abort(403, 'Unauthorized action')
+            
+        # Récupérer l'utilisateur existant
+        user = facade.get_user(user_id)
+        if not user:
+            api.abort(404, 'User not found')
+            
+        user_data = api.payload
+      
+        try:
+            updated_user = facade.update_user(user_id, **user_data)
+            return format_user_response(updated_user), 200
+        except ValueError as e:
+            api.abort(400, str(e))
+
+@api.route('/users/')
+class AdminUserCreate(Resource):
+    @jwt_required()
+    @api.expect(user_model, validate=True)
+    @api.marshal_with(user_registration_response_model)
+    @api.response(201, 'User created successfully')
+    @api.response(400, 'Invalid input or email already registered')
+    @api.response(500, 'Internal server error')
+    def post(self):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        user_data = api.payload
+        email = user_data.get('email')
+
+        # Check if email is already in use
+        if facade.get_user_by_email(email):
+            return {'error': 'Email already registered'}, 400
+
+        try:
+            data = api.payload
+            # Hash the password before creating the user
+            password_hash = User.hash_password(data['password'])
+            
+            # 🔒 Sécurité : Supprimer le password plain text de la mémoire
+            data.pop('password', None)
+            
+            # Create user with hashed password
+            new_user = facade.create_user(
+                email=data['email'],
+                first_name=data['first_name'],
+                last_name=data['last_name'],
+                password=password_hash
+            )
+            return {'id': new_user.id, 'message': 'User registered successfully'}, 201
+        except ValueError as e:
+            api.abort(400, str(e) or 'Invalid input data')
+        except Exception as e:
+            api.abort(500, 'An unexpected error occurred')
