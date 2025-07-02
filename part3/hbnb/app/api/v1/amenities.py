@@ -2,7 +2,7 @@
 
 from flask_restx import Namespace, Resource, fields
 from app.services.facade import hbnb_facade as facade
-
+from flask_jwt_extended import jwt_required, get_jwt_identity
 api = Namespace('amenities', description='Amenity operations')
 
 # Define the amenity model for input validation and documentation
@@ -26,15 +26,19 @@ amenities_list = api.model('AmenityList', {
     'amenities': fields.List(fields.Nested(amenity_response), description='List of amenities')
 })
 
-@api.route('/')
+@api.route('/amenities/')
 @api.doc(security=None)
-class AmenityList(Resource):
+class AdminAmenityCreate(Resource):
     @api.expect(amenity_model, validate=True)
     @api.response(201, 'Amenity successfully created', model=amenity_response)
     @api.response(400, 'Invalid input data', model=api.model('Error', {
         'message': fields.String(description='Error message', example='Name is required')
     }))
+    @jwt_required()
     def post(self):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
         """
         Register a new amenity
         
@@ -62,7 +66,7 @@ class AmenityList(Resource):
 
 @api.route('/<amenity_id>')
 @api.doc(security=None, params={'amenity_id': 'The amenity identifier'})
-class AmenityResource(Resource):
+class AdminAmenityModify(Resource):
     @api.response(200, 'Amenity details retrieved successfully', model=amenity_response)
     @api.response(404, 'Amenity not found', model=api.model('Error', {
         'message': fields.String(description='Error message', example='Amenity not found')
@@ -88,7 +92,11 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data', model=api.model('Error', {
         'message': fields.String(description='Error message', example='Name is required')
     }))
+    @jwt_required()
     def put(self, amenity_id):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
         """
         Update an amenity
         
