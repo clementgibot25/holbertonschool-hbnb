@@ -94,6 +94,17 @@ class HBnBFacade:
             A list of all User instances
         """
         return self.user_service.get_all_users()
+        
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        """Retrieve a user by their email address.
+        
+        Args:
+            email: The email address to search for
+            
+        Returns:
+            The User instance if found, None otherwise
+        """
+        return self.user_service.get_user_by_email(email)
 
     # Place methods
     def create_place(self, **kwargs) -> Place:
