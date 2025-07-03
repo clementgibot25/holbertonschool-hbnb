@@ -13,7 +13,8 @@ def format_user_response(user):
         'id': user.id,
         'first_name': user.first_name,
         'last_name': user.last_name,
-        'email': user.email
+        'email': user.email,
+        'is_admin': user.is_admin
     }
 
 api = Namespace('users', description='User operations')
@@ -48,13 +49,18 @@ user_model = api.model('User', {
         max_length=128,
         description='User password (at least 8 characters, not returned in response)',
         example='MySecurePassword123!'
+    ),
+    'is_admin': fields.Boolean(
+        required=False,
+        description='User admin status',
+        example=False
     )
 })
 
-# User update model - only modifiable fields
+# User update model - includes all modifiable fields
 user_update_model = api.model('UserUpdate', {
     'first_name': fields.String(
-        required=True,
+        required=False,
         min_length=1,
         max_length=50,
         pattern=r"^[a-zA-Zà-ÿÀ-Ÿ\s\-']+$",
@@ -62,12 +68,30 @@ user_update_model = api.model('UserUpdate', {
         example='Marie-Louise'
     ),
     'last_name': fields.String(
-        required=True,
+        required=False,
         min_length=1,
         max_length=50,
         pattern=r"^[a-zA-Zà-ÿÀ-Ÿ\s\-']+$",
         description="User last name (letters, accents, spaces, hyphens and apostrophes only)",
         example="O'Connor"
+    ),
+    'email': fields.String(
+        required=False,
+        description='New email address (admins only)',
+        pattern=r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
+        example="new.email@example.com"
+    ),
+    'password': fields.String(
+        required=False,
+        min_length=8,
+        max_length=128,
+        description='New password (admins only, at least 8 characters)',
+        example='NewSecurePassword123!'
+    ),
+    'is_admin': fields.Boolean(
+        required=False,
+        description='Admin status (admins only)',
+        example=False
     )
 })
 
@@ -76,7 +100,8 @@ user_response_model = api.model('UserResponse', {
     'id': fields.String(description='User ID'),
     'first_name': fields.String(description='User first name'),
     'last_name': fields.String(description='User last name'),
-    'email': fields.String(description='User email address')
+    'email': fields.String(description='User email address'),
+    'is_admin': fields.Boolean(description='User admin status')
     # Password volontairement omis pour la sécurité
 })
 
@@ -121,84 +146,67 @@ class UserResource(Resource):
     @api.expect(user_update_model, validate=True)
     @api.marshal_with(user_response_model)
     @api.response(200, 'User successfully updated')
-    @api.response(400, 'You cannot modify email or password.')
+    @api.response(400, 'Invalid request')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'User not found')
+    @api.response(409, 'Email already in use')
     @jwt_required()
     def put(self, user_id):
         """
         Update an existing user
         
-        Update user information. Only first_name and last_name can be modified.
-        Email and password modifications are not allowed.
+        Update user information. 
+        - Regular users can only update their own first_name and last_name
+        - Admins can update any user's information including is_admin status
+        - Email and password can only be modified by admins
         """
         current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        is_admin = current_user and current_user.is_admin
         
-        # Vérifier que l'utilisateur modifie son propre compte
-        if current_user_id != user_id:
+        # Vérifier que l'utilisateur modifie son propre compte ou est admin
+        if current_user_id != user_id and not is_admin:
             api.abort(403, 'Unauthorized action')
             
-        # Récupérer l'utilisateur existant
+        # Récupérer l'utilisateur à modifier
         user = facade.get_user(user_id)
         if not user:
             api.abort(404, 'User not found')
             
-        user_data = api.payload
+        user_data = api.payload.copy()
         
-        # Vérification de sécurité : s'assurer qu'aucun champ interdit n'est présent
-        forbidden_fields = ['email', 'password', 'id', 'is_admin']
-        for field in forbidden_fields:
-            if field in user_data:
-                api.abort(400, 'You cannot modify email or password.')
+        # Vérification des champs interdits pour les non-admins
+        if not is_admin:
+            forbidden_fields = ['email', 'password', 'id', 'is_admin']
+            for field in forbidden_fields:
+                if field in user_data:
+                    api.abort(403, f'Admin privileges required to modify {field}')
         
-        try:
-            updated_user = facade.update_user(user_id, **user_data)
-            return format_user_response(updated_user), 200
-        except ValueError as e:
-            api.abort(400, str(e))
-
-@api.route('/users/<user_id>')
-class AdminUserModify(Resource):
-    @jwt_required()
-    @api.expect(user_update_model, validate=True)
-    @api.marshal_with(user_response_model)
-    @api.response(200, 'User successfully updated')
-    @api.response(400, 'You cannot modify email or password.')
-    @api.response(403, 'Unauthorized action')
-    @api.response(404, 'User not found')
-    def put(self, user_id):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
-
-        data = api.payload
-        email = data.get('email')
-
-        # Ensure email uniqueness
-        if email:
-            existing_user = facade.get_user_by_email(email)
+        # Vérification de l'unicité de l'email si modification
+        if 'email' in user_data and user_data['email'] != user.email:
+            existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user and existing_user.id != user_id:
-                return {'error': 'Email already in use'}, 400
-
-        # Logic to update user details
-        current_user_id = get_jwt_identity()
+                api.abort(409, 'Email already in use')
         
-        # Vérifier que l'utilisateur modifie son propre compte
-        if current_user_id != user_id:
-            api.abort(403, 'Unauthorized action')
-            
-        # Récupérer l'utilisateur existant
-        user = facade.get_user(user_id)
-        if not user:
-            api.abort(404, 'User not found')
-            
-        user_data = api.payload
-      
-        try:
-            updated_user = facade.update_user(user_id, **user_data)
-            return format_user_response(updated_user), 200
-        except ValueError as e:
-            api.abort(400, str(e))
+        # Traitement du mot de passe (hachage si fourni)
+        if 'password' in user_data and user_data['password']:
+            user_data['password'] = User.hash_password(user_data['password'])
+        
+        # Mise à jour des champs fournis
+        for field, value in user_data.items():
+            if hasattr(user, field) and value is not None:
+                # Pour les booléens comme is_admin, on accepte explicitement False
+                if isinstance(getattr(user, field), bool):
+                    setattr(user, field, value)
+                # Pour les chaînes, on ne met à jour que si la valeur n'est pas vide
+                elif value != '':
+                    setattr(user, field, value)
+        
+        # Sauvegarder les modifications
+        facade.update_user(user.id, **{k: v for k, v in user_data.items() 
+                                    if hasattr(user, k) and v is not None and v != ''})
+        
+        return format_user_response(user), 200
 
 @api.route('/users/')
 class AdminUserCreate(Resource):
@@ -207,16 +215,27 @@ class AdminUserCreate(Resource):
     @api.marshal_with(user_registration_response_model)
     @api.response(201, 'User created successfully')
     @api.response(400, 'Invalid input or email already registered')
+    @api.response(403, 'Admin privileges required')
     @api.response(500, 'Internal server error')
     def post(self):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
+        # Récupérer l'ID de l'utilisateur depuis le token JWT
+        current_user_id = get_jwt_identity()
+        print(f"[DEBUG] User ID from token: {current_user_id}")
+        
+        # Vérifier si l'utilisateur est admin
+        current_user = facade.get_user(current_user_id)
+        print(f"[DEBUG] Current user: {current_user}")
+        if current_user:
+            print(f"[DEBUG] User is admin: {getattr(current_user, 'is_admin', 'no is_admin attribute')}")
+        
+        if not current_user or not getattr(current_user, 'is_admin', False):
+            print("[DEBUG] Access denied - User is not admin or doesn't exist")
+            return {'error': 'Admin privileges required', 'user_id': current_user_id}, 403
 
         user_data = api.payload
         email = user_data.get('email')
 
-        # Check if email is already in use
+        # Vérifier si l'email est déjà utilisé
         if facade.get_user_by_email(email):
             return {'error': 'Email already registered'}, 400
 

@@ -2,6 +2,39 @@ from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import create_access_token
 from app.services.facade import hbnb_facade as facade
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.models.user import User
+from datetime import datetime, timedelta
+
+# Utilisateur administrateur par défaut
+DEFAULT_ADMIN = {
+    'id': '00000000-0000-0000-0000-000000000000',
+    'email': 'admin@hbnb.com',
+    'password': 'hbnb_admin_123!',  # À changer en production
+    'first_name': 'Admin',
+    'last_name': 'System',
+    'is_admin': True
+}
+
+def get_or_create_default_admin():
+    """Crée ou récupère l'utilisateur administrateur par défaut"""
+    try:
+        # Essayer de récupérer l'admin par email
+        admin = facade.get_user_by_email(DEFAULT_ADMIN['email'])
+        if not admin:
+            print("[AUTH] Creating default admin user...")
+            # Créer un nouvel utilisateur admin via le service utilisateur
+            admin = facade.user_service.create_user(
+                email=DEFAULT_ADMIN['email'],
+                first_name=DEFAULT_ADMIN['first_name'],
+                last_name=DEFAULT_ADMIN['last_name'],
+                password=DEFAULT_ADMIN['password'],  # Le service va hasher le mot de passe
+                is_admin=True
+            )
+            print(f"[AUTH] Created admin user: {admin.id}")
+        return admin
+    except Exception as e:
+        print(f"[AUTH] Error in get_or_create_default_admin: {str(e)}")
+        raise
 
 
 api = Namespace('auth', description='Authentication operations')
@@ -31,6 +64,30 @@ class Login(Resource):
         
         # Step 4: Return the JWT token to the client
         return {'access_token': access_token}, 200
+
+@api.route('/admin-token')
+class AdminToken(Resource):
+    def get(self):
+        """Get an admin token for development purposes"""
+        try:
+            admin = get_or_create_default_admin()
+            access_token = create_access_token(
+                identity=str(admin.id),
+                expires_delta=timedelta(days=1)  # Token valable 24h
+            )
+            return {
+                'access_token': access_token,
+                'user': {
+                    'id': admin.id,
+                    'email': admin.email,
+                    'first_name': admin.first_name,
+                    'last_name': admin.last_name,
+                    'is_admin': admin.is_admin
+                }
+            }, 200
+        except Exception as e:
+            print(f"[AUTH] Error generating admin token: {str(e)}")
+            return {'error': 'Failed to generate admin token'}, 500
 
 @api.route('/protected')
 class ProtectedResource(Resource):
