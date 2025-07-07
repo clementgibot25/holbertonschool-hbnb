@@ -4,6 +4,7 @@
 
 from flask_restx import Namespace, Resource, fields, abort
 from flask import request
+from http import HTTPStatus
 from app.services.facade import hbnb_facade as facade
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -55,7 +56,8 @@ def _get_owner_details(owner_id: str):
 
 api = Namespace('places', description='Place operations')
 
-place_model = api.model('Place', {
+# Model for creating a place (no owner_id - taken from JWT)
+place_create_model = api.model('PlaceCreate', {
     'title': fields.String(
         required=True,
         min_length=1,
@@ -85,10 +87,44 @@ place_model = api.model('Place', {
         description='Geographic longitude',
         example=2.3522
     ),
-    'owner_id': fields.String(
-        required=True,
-        description='ID of the user who owns this place',
-        example='user_12345'
+    'amenities': fields.List(
+        fields.String,
+        required=False,
+        description="List of amenities ID's",
+        example=['wifi', 'tv', 'piscine']
+    )
+})
+
+# Model for updating a place (no owner_id modification allowed)
+place_update_model = api.model('PlaceUpdate', {
+    'title': fields.String(
+        required=False,
+        min_length=1,
+        max_length=100,
+        description='Title of the place',
+        example='Updated Studio in Paris'
+    ),
+    'description': fields.String(
+        required=False,
+        min_length=1,
+        max_length=500,
+        description='Detailed description of the place',
+        example='An updated description of the apartment.'
+    ),
+    'price': fields.Float(
+        required=False,
+        description='Price per night (must be positive)',
+        example=95.0,
+    ),
+    'latitude': fields.Float(
+        required=False,
+        description='Geographic latitude',
+        example=48.8566
+    ),
+    'longitude': fields.Float(
+        required=False,
+        description='Geographic longitude',
+        example=2.3522
     ),
     'amenities': fields.List(
         fields.String,
@@ -162,8 +198,8 @@ class PlaceList(Resource):
         places = facade.place_service.get_all_places()
         return [format_place_summary(p) for p in places], 200
 
-    @api.expect(place_model, validate=True)
-    @api.marshal_with(place_response_model, code=201)
+    @api.expect(place_create_model, validate=True)
+    @api.marshal_with(place_response_model, code=HTTPStatus.CREATED.value)  # type: ignore
     @api.response(201, 'Place registered successfully')
     @api.response(400, 'Invalid input')
     @api.response(500, 'Internal server error')
@@ -173,19 +209,23 @@ class PlaceList(Resource):
         Register a new place
         
         Create a new place with the provided information.
+        The owner is automatically set to the authenticated user.
         You can associate 0 to multiple amenities by including their IDs in the 'amenities' array.
         """
         try:
-            data = api.payload
+            data = api.payload.copy()
+            # Add owner_id from JWT token
+            data['owner_id'] = get_jwt_identity()
+            
             # Basic validation for price
             if data['price'] < 0:
-                abort(400, 'Price must be non-negative')
+                abort(HTTPStatus.BAD_REQUEST.value, 'Price must be non-negative')  # type: ignore
             new_place = facade.create_place(**data)
-            return format_place_response(new_place, include_owner=False), 201
+            return format_place_response(new_place, include_owner=False), HTTPStatus.CREATED
         except ValueError as e:
-            abort(404, str(e))  # Handles both negative price errors and user not found errors
+            abort(HTTPStatus.NOT_FOUND.value, str(e))  # type: ignore
         except Exception:
-            abort(500, 'An unexpected error occurred')
+            abort(HTTPStatus.INTERNAL_SERVER_ERROR.value, 'An unexpected error occurred')  # type: ignore
 
 
 @api.route('/<place_id>')
@@ -203,33 +243,49 @@ class AdminPlaceModify(Resource):
         """
         place = facade.get_place(place_id)
         if not place:
-            abort(404, 'Place not found')
+            abort(404, 'Place not found')  # type: ignore
         return format_place_response(place, include_owner=True), 200
 
-    @api.expect(place_model, validate=True)
+    @api.expect(place_update_model, validate=True)
     @api.response(200, 'Place updated successfully')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'Place not found')
+    @api.response(403, 'Unauthorized action')
     @jwt_required()
     def put(self, place_id):
-        current_user = get_jwt_identity()
-
-        is_admin = current_user.get('is_admin', False)
-        user_id = current_user.get('id')
-
-        place = facade.get_place(place_id)
-        if not is_admin and place.owner_id != user_id:
-            return {'error': 'Unauthorized action'}, 403
         """
         Update an existing place
         
         Update the details of an existing place. Only the fields provided
-        in the request will be updated.
+        in the request will be updated. The owner cannot be changed.
+        
+        - Regular users can only update their own places
+        - Admins can update any place (bypass ownership restrictions)
         """
-        updates = api.payload
-        place = facade.place_service.update_place(place_id, **updates)
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        is_admin = current_user and getattr(current_user, 'is_admin', False)
+        user_id = current_user_id
+
+        # Check if place exists first
+        place = facade.get_place(place_id)
         if not place:
-            abort(404, 'Place not found')
-        if place.owner_id != get_jwt_identity():
-            abort(403, 'You are not authorized to update this place')
-        return {'message': 'Place updated successfully'}, 200
+            abort(HTTPStatus.NOT_FOUND.value, 'Place not found')  # type: ignore
+        
+        # Assert pour le type checker
+        assert place is not None
+            
+        # Check authorization: admins can update any place, users only their own
+        if not is_admin and place.owner_id != user_id:
+            return {'error': 'Unauthorized action'}, HTTPStatus.FORBIDDEN
+
+        # Update the place (owner_id cannot be changed)
+        updates = api.payload.copy()
+        if 'owner_id' in updates:
+            del updates['owner_id']  # Remove owner_id if somehow present
+            
+        updated_place = facade.place_service.update_place(place_id, **updates)
+        if not updated_place:
+            abort(HTTPStatus.NOT_FOUND.value, 'Place not found')  # type: ignore
+            
+        return {'message': 'Place updated successfully'}, HTTPStatus.OK
