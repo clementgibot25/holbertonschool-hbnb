@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # Display available routes
     print("\n🔍 Available routes:")
     for rule in sorted(app.url_map.iter_rules(), key=lambda r: r.rule):
-        methods = ','.join(sorted(rule.methods - {'OPTIONS', 'HEAD'}))
+        methods = ','.join(sorted((rule.methods or set()) - {'OPTIONS', 'HEAD'}))
         print(f"  {rule.rule} -> {rule.endpoint} [{methods}]")
     
     # Display important URLs (using 127.0.0.1 for clickable links in terminal)
@@ -41,4 +41,4 @@ if __name__ == '__main__':
     print("="*50 + "\n")
     
     # Start the development server
-    app.run(host=host, port=port, debug=debug)
+    app.run(host=host, port=port, debug=debug, use_reloader=False)
