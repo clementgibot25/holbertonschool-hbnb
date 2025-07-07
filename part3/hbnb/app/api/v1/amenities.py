@@ -26,25 +26,28 @@ amenities_list = api.model('AmenityList', {
     'amenities': fields.List(fields.Nested(amenity_response), description='List of amenities')
 })
 
-@api.route('/amenities/')
-@api.doc(security=None)
+@api.route('/')
 class AdminAmenityCreate(Resource):
     @api.expect(amenity_model, validate=True)
     @api.response(201, 'Amenity successfully created', model=amenity_response)
     @api.response(400, 'Invalid input data', model=api.model('Error', {
         'message': fields.String(description='Error message', example='Name is required')
     }))
+    @api.response(403, 'Admin privileges required')
     @jwt_required()
     def post(self):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
         """
         Register a new amenity
         
         Use this endpoint to create a new amenity with the provided name.
         The name must be unique (case-insensitive).
+        Only administrators can create amenities.
         """
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        
+        if not current_user or not getattr(current_user, 'is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
         if not api.payload or 'name' not in api.payload:
             api.abort(400, {'message': 'Name is required'})
             
@@ -65,7 +68,7 @@ class AdminAmenityCreate(Resource):
         return {'amenities': [a.to_dict() for a in amenities]}, 200
 
 @api.route('/<amenity_id>')
-@api.doc(security=None, params={'amenity_id': 'The amenity identifier'})
+@api.param('amenity_id', 'The amenity identifier')
 class AdminAmenityModify(Resource):
     @api.response(200, 'Amenity details retrieved successfully', model=amenity_response)
     @api.response(404, 'Amenity not found', model=api.model('Error', {
@@ -92,16 +95,20 @@ class AdminAmenityModify(Resource):
     @api.response(400, 'Invalid input data', model=api.model('Error', {
         'message': fields.String(description='Error message', example='Name is required')
     }))
+    @api.response(403, 'Admin privileges required')
     @jwt_required()
     def put(self, amenity_id):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
         """
         Update an amenity
         
         Update the name of an existing amenity. The name must be unique.
+        Only administrators can update amenities.
         """
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        
+        if not current_user or not getattr(current_user, 'is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
         if not api.payload or 'name' not in api.payload:
             return {'message': 'Name is required'}, 400
             
