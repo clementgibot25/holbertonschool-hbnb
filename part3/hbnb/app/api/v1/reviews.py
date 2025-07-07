@@ -7,7 +7,7 @@ from app.models.place import Place
 api = Namespace('reviews', description='Review operations')
 
 # Define the review model for input validation and documentation
-review_model = api.model('Review', {
+review_create_model = api.model('ReviewCreate', {
     'text': fields.String(
         required=True,
         description='Text of the review',
@@ -21,17 +21,31 @@ review_model = api.model('Review', {
         example=5,
         min=1,
         max=5),
-    'user_id': fields.String(required=True,
-        description='ID of the user',
-        example='user_12345'),
     'place_id': fields.String(required=True,
         description='ID of the place',
         example='place_12345')
 })
 
+# Define the review update model (no user_id or place_id modification allowed)
+review_update_model = api.model('ReviewUpdate', {
+    'text': fields.String(
+        required=False,
+        description='Text of the review',
+        example='Updated review text!',
+        min_length=1,
+        max_length=1000,
+        pattern=r'^[\w\s\-\'\.,!?()\[\]{}@#$%^&*+=:;"\u00C0-\u017F]+$',
+    ),
+    'rating': fields.Integer(required=False,
+        description='Rating of the place (1-5)',
+        example=4,
+        min=1,
+        max=5)
+})
+
 @api.route('/')
 class ReviewList(Resource):
-    @api.expect(review_model, validate=True)
+    @api.expect(review_create_model, validate=True)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     @api.response(404, 'User or Place not found')
@@ -40,8 +54,8 @@ class ReviewList(Resource):
         """
         Register a new review
         
-        Create a new review for a place. The user_id must reference
-        an existing user, and place_id must reference an existing place.
+        Create a new review for a place. The user_id is automatically 
+        set from the authenticated user. The place_id must reference an existing place.
         Rating must be between 1 and 5.
         """
         try:
@@ -53,7 +67,7 @@ class ReviewList(Resource):
             existing_reviews = facade.get_reviews_by_place(place_id)
             for review in existing_reviews:
                 if review.user_id == user_id:
-                    abort(HTTPStatus.BAD_REQUEST, 'You have already reviewed this place')
+                    abort(HTTPStatus.BAD_REQUEST.value, 'You have already reviewed this place')  # type: ignore
             
             new_review = facade.create_review(
                 text=review_data['text'],
@@ -62,17 +76,17 @@ class ReviewList(Resource):
                 place_id=place_id
             )
             if not new_review:
-                abort(HTTPStatus.BAD_REQUEST, 'Invalid input data')
+                abort(HTTPStatus.BAD_REQUEST.value, 'Invalid input data')  # type: ignore
             place = facade.get_place(place_id)
-            if place.owner_id == get_jwt_identity():
-                abort(HTTPStatus.FORBIDDEN, 'You are not authorized to create this review')
+            if place and place.owner_id == get_jwt_identity():
+                abort(HTTPStatus.FORBIDDEN.value, 'You are not authorized to create this review')  # type: ignore
             return {
                 'id': new_review.id,
                 'text': new_review.text,
                 'rating': new_review.rating,
                 'user_id': new_review.user_id,
                 'place_id': new_review.place_id
-            }, HTTPStatus.CREATED
+            }, 201
         except Exception as e:
             # Validation errors are already handled by the service
             # Let the exception propagate so it can be handled by the Flask-RestX error handler
@@ -105,9 +119,10 @@ class ReviewResource(Resource):
             return {'error': 'Review not found'}, 404
         return {'id': review.id, 'text': review.text, 'rating': review.rating, 'user_id': review.user_id, 'place_id': review.place_id}, 200
 
-    @api.expect(review_model, validate=True)
+    @api.expect(review_update_model, validate=True)
     @api.response(200, 'Review updated successfully')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Unauthorized action')
     @api.response(404, 'Review, User or Place not found')
     @jwt_required()
     def put(self, review_id):
@@ -116,27 +131,49 @@ class ReviewResource(Resource):
         
         Update the details of an existing review. Only the fields provided
         in the request will be updated. The rating must be between 1 and 5.
+        
+        - Regular users can only update their own reviews
+        - Admins can update any review (bypass ownership restrictions)
         """
         try:
+            current_user_id = get_jwt_identity()
+            current_user = facade.get_user(current_user_id)
+            is_admin = current_user and getattr(current_user, 'is_admin', False)
+            
+            # Get the review first to check ownership
+            review = facade.get_review(review_id)
+            if not review:
+                abort(HTTPStatus.NOT_FOUND.value, 'Review not found')  # type: ignore
+            
+            # Assert pour le type checker
+            assert review is not None
+                
+            # Check authorization: admins can update any review, users only their own
+            if not is_admin and review.user_id != current_user_id:
+                abort(HTTPStatus.FORBIDDEN.value, 'You are not authorized to update this review')  # type: ignore
+            
             review_data = api.payload
             updated_review = facade.update_review(review_id, **review_data)
             if not updated_review:
-                abort(HTTPStatus.NOT_FOUND, 'Review not found')
-            if updated_review.user_id != get_jwt_identity():
-                abort(HTTPStatus.FORBIDDEN, 'You are not authorized to update this review')
+                abort(HTTPStatus.NOT_FOUND.value, 'Review not found')  # type: ignore
+            
+            # Assert pour le type checker
+            assert updated_review is not None
+                
             return {
                 'id': updated_review.id,
                 'text': updated_review.text,
                 'rating': updated_review.rating,
                 'user_id': updated_review.user_id,
                 'place_id': updated_review.place_id
-            }, HTTPStatus.OK
+            }, 200
         except Exception as e:
             # Validation errors are already handled by the service
             # Let the exception propagate so it can be handled by the Flask-RestX error handler
             raise
 
     @api.response(200, 'Review deleted successfully')
+    @api.response(403, 'Unauthorized action')
     @api.response(404, 'Review not found')
     @jwt_required()
     def delete(self, review_id):
@@ -145,13 +182,28 @@ class ReviewResource(Resource):
         
         Permanently remove a review from the system.
         This action cannot be undone.
+        
+        - Regular users can only delete their own reviews
+        - Admins can delete any review (bypass ownership restrictions)
         """
-        if not facade.get_review(review_id):
-            abort(HTTPStatus.NOT_FOUND, 'Review not found')
-        if facade.get_review(review_id).user_id != get_jwt_identity():
-            abort(HTTPStatus.FORBIDDEN, 'You are not authorized to delete this review')
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        is_admin = current_user and getattr(current_user, 'is_admin', False)
+        
+        # Get the review first
+        review = facade.get_review(review_id)
+        if not review:
+            abort(HTTPStatus.NOT_FOUND.value, 'Review not found')  # type: ignore
+        
+        # Assert pour le type checker
+        assert review is not None
+            
+        # Check authorization: admins can delete any review, users only their own
+        if not is_admin and review.user_id != current_user_id:
+            abort(HTTPStatus.FORBIDDEN.value, 'You are not authorized to delete this review')  # type: ignore
+            
         facade.delete_review(review_id)
-        return {'message': 'Review deleted successfully'}, HTTPStatus.OK
+        return {'message': 'Review deleted successfully'}, 200
 
 @api.route('/places/<place_id>/reviews')
 class PlaceReviewList(Resource):
