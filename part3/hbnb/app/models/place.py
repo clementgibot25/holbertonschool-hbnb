@@ -2,6 +2,7 @@
 
 """Defines the Place model for the application."""
 
+from app import db
 from app.models.base_model import BaseModel
 from typing import List, Optional
 
