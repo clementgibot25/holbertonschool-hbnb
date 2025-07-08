@@ -13,7 +13,7 @@ from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
-from app.persistence.in_memory_repository import InMemoryRepository
+from app.persistence.repository import SQLAlchemyRepository
 
 
 class HBnBFacade:
@@ -30,10 +30,10 @@ class HBnBFacade:
         Sets up in-memory repositories and initializes the corresponding services.
         """
         # Initialize repositories
-        user_repo = InMemoryRepository()
-        place_repo = InMemoryRepository()
-        review_repo = InMemoryRepository()
-        amenity_repo = InMemoryRepository()
+        user_repo = SQLAlchemyRepository(User)
+        place_repo = SQLAlchemyRepository(Place)
+        review_repo = SQLAlchemyRepository(Review)
+        amenity_repo = SQLAlchemyRepository(Amenity)
         
         # Initialize services with their respective repositories
         self.user_service = UserService(user_repo)
