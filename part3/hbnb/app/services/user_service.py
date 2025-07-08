@@ -9,8 +9,7 @@ related to user management, including creation, retrieval, and updates.
 from typing import List, Optional
 from app.models.user import User
 from app.persistence.repository import Repository
-from app.persistence.in_memory_repository import InMemoryRepository
-
+from app.persistence.user_repository import UserRepository
 
 class UserService:
     """Service class for handling user-related operations.
@@ -26,7 +25,7 @@ class UserService:
             repository: The repository to use for data access. If not provided,
                      an InMemoryRepository will be used by default.
         """
-        self.repository = repository or InMemoryRepository()
+        self.repository = repository or UserRepository()
     
     def create_user(self, email: str, first_name: str, last_name: str, password: str, is_admin: bool = False) -> User:
         """Create a new user with the provided information.
@@ -78,8 +77,7 @@ class UserService:
         Returns:
             The User instance if found, None otherwise
         """
-        result = self.repository.get_by_attribute('email', email)
-        return result[0] if result else None
+        return self.repository.get_user_by_email(email)
     
     def get_all_users(self) -> List[User]:
         """Retrieve all users in the system.
