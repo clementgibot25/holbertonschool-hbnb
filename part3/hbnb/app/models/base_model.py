@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 
-class BaseModel:
+class BaseModel(db.Model):
     """Base class for all models with common attributes and methods."""
     __abstract__ = True
 
