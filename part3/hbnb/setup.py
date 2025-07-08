@@ -11,5 +11,6 @@ setup(
         'flask-bcrypt',
         'flask-jwt-extended',
         'python-dotenv',
+        'typing-extensions>=3.7.4',
     ],
 )
