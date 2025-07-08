@@ -15,7 +15,7 @@ from app.models.amenity import Amenity
 from app.models.review import Review
 from app.models.user import User
 from app.persistence.repository import Repository
-from app.persistence.in_memory_repository import InMemoryRepository
+from app.persistence.place_repository import PlaceRepository
 from app.services.user_service import user_service as global_user_service
 
 class PlaceService:
@@ -33,7 +33,7 @@ class PlaceService:
                      an InMemoryRepository will be used by default.
             user_service: The user service to use for user-related operations.
         """
-        self.repository = repository or InMemoryRepository()
+        self.repository = repository or PlaceRepository()
         self.user_service = user_service or global_user_service
     
     def _validate_user_exists(self, user_id: str) -> None:

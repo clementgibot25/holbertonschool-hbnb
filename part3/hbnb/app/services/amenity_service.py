@@ -9,7 +9,7 @@ related to amenity management, including creation, retrieval, and updates.
 from typing import List, Optional
 from app.models.amenity import Amenity
 from app.persistence.repository import Repository
-from app.persistence.in_memory_repository import InMemoryRepository
+from app.persistence.amenity_repository import AmenityRepository
 
 class AmenityService:
     """Service class for handling amenity-related operations.
@@ -25,7 +25,7 @@ class AmenityService:
             repository: The repository to use for data access. If not provided,
                      an InMemoryRepository will be used by default.
         """
-        self.repository = repository or InMemoryRepository()
+        self.repository = repository or AmenityRepository()
     
     def create_amenity(self, name: str) -> Amenity:
         """Create a new amenity with the provided name.

@@ -11,7 +11,7 @@ from flask_restx import abort
 from http import HTTPStatus
 from app.models.review import Review
 from app.persistence.repository import Repository
-from app.persistence.in_memory_repository import InMemoryRepository
+from app.persistence.review_repository import ReviewRepository
 
 class ReviewService:
     """Service class for handling review-related operations.
@@ -29,7 +29,7 @@ class ReviewService:
             user_service: Service for user-related operations
             place_service: Service for place-related operations
         """
-        self.repository = repository or InMemoryRepository()
+        self.repository = repository or ReviewRepository()
         self.user_service = user_service
         self.place_service = place_service
         
