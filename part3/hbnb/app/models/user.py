@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 
 """Defines the User model for the application."""
-
+from app import db
+import uuid
 from app.models.base_model import BaseModel
 
 class User(BaseModel):
+    __abstract__ = True
     """Represents a user in the application.
     
     Attributes:
@@ -15,6 +17,13 @@ class User(BaseModel):
         is_admin (bool): Whether the user has admin privileges
         places (list): List of place IDs owned by this user
     """
+
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    places = db.relationship('Place', backref='user', lazy=True)
     
     def __init__(self, email: str, first_name: str, last_name: str, 
                  password: str, is_admin: bool = False, **kwargs):
