@@ -1,3 +1,4 @@
+from typing import Optional
 from app.models.user import User
 from app.persistence.repository import SQLAlchemyRepository
 
