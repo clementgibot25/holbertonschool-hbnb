@@ -6,7 +6,7 @@ import uuid
 from app.models.base_model import BaseModel
 
 class User(BaseModel):
-    __abstract__ = True
+    __tablename__ = 'users'
     """Represents a user in the application.
     
     Attributes:
@@ -23,7 +23,7 @@ class User(BaseModel):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
-    places = db.relationship('Place', backref='user', lazy=True)
+    # places = db.relationship('Place', backref='user', lazy=True)  # Temporairement désactivé
     
     def __init__(self, email: str, first_name: str, last_name: str, 
                  password: str, is_admin: bool = False, **kwargs):
@@ -43,7 +43,7 @@ class User(BaseModel):
         self.last_name = last_name
         self.password = password  # Already hashed password
         self.is_admin = is_admin
-        self.places = []  # List of place IDs owned by this user
+        # self.places = []  # List of place IDs owned by this user (temporairement désactivé)
 
     @staticmethod
     def hash_password(password: str) -> str:
