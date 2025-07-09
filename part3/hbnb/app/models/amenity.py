@@ -14,8 +14,7 @@ class Amenity(BaseModel):
     __tablename__ = 'amenities'
     
     name = db.Column(db.String(120), nullable=False)
-    places = db.relationship('Place', secondary='place_amenity', backref='amenities', lazy=True)
-
+    
     def __init__(self, name: str, **kwargs):
         """Initialize a new Amenity instance.
         
