@@ -25,11 +25,14 @@ def create_app(config_class=None):
     bcrypt.init_app(app)
     jwt.init_app(app)
 
-    # Créer les tables User dans le contexte de l'application
+    # Créer les tables dans le contexte de l'application
     with app.app_context():
-        # Importer le modèle User pour que SQLAlchemy le connaisse
+        # Importer TOUS les modèles pour que SQLAlchemy les connaisse
         from app.models.user import User
-        # Créer la table User
+        from app.models.place import Place
+        from app.models.review import Review
+        from app.models.amenity import Amenity
+        # Créer toutes les tables
         db.create_all()
 
     # Importer les routes après l'initialisation de db
