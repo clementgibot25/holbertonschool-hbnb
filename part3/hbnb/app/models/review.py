@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 """Defines the Review model for the application."""
-
+from app import db
+import uuid
 from app.models.base_model import BaseModel
 
 class Review(BaseModel):
@@ -13,6 +14,11 @@ class Review(BaseModel):
         place_id (str): ID of the reviewed place
         user_id (str): ID of the user who wrote the review
     """
+    __tablename__ = 'reviews'
+    text = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    place_id = db.Column(db.String(60), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.String(60), db.ForeignKey('users.id'), nullable=False)
     
     def __init__(self,
                 text: str,

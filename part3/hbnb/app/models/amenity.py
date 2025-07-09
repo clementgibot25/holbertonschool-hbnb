@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 """Defines the Amenity model for the application."""
-
+from app import db
+import uuid
 from app.models.base_model import BaseModel
 
 class Amenity(BaseModel):
@@ -10,7 +11,11 @@ class Amenity(BaseModel):
     Attributes:
         name (str): The name of the amenity (e.g., 'WiFi', 'Pool', 'Parking')
     """
+    __tablename__ = 'amenities'
     
+    name = db.Column(db.String(120), nullable=False)
+    places = db.relationship('Place', secondary='place_amenity', backref='amenities', lazy=True)
+
     def __init__(self, name: str, **kwargs):
         """Initialize a new Amenity instance.
         
@@ -28,6 +33,5 @@ class Amenity(BaseModel):
             dict: Dictionary containing the amenity's attributes
         """
         return {
-            'id': self.id,
             'name': self.name
         }
