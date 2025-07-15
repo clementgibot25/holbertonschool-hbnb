@@ -272,14 +272,12 @@ curl -X GET http://localhost:5000/api/v1/users/
 
 This implementation focuses on the **Presentation** and **Business Logic** layers:
 
-### Current Phase (Part 2)
-- ✅ RESTful API with comprehensive CRUD operations
-- ✅ Business logic with proper validation and relationships
-- ✅ In-memory persistence with repository pattern
+### Current Phase (Part 3)
+- ✅ Integration with a database (SQLite)
+- ✅ Use of SQLAlchemy for ORM
 - ✅ Modular architecture ready for scaling
 
 ### Future Phases
-- 🔄 **Part 3**: Database integration with SQLAlchemy
 - 🔄 **Part 4**: JWT authentication and authorization
 
 ---
