@@ -16,13 +16,11 @@ def format_place_response(place, include_owner: bool = False):
     # Build amenity details when needed
     amenities = []
     if include_owner:
-        for amenity_id in getattr(place, 'amenities', []):
-            amenity = facade.amenity_service.get_amenity(amenity_id)
-            if amenity:
-                amenities.append({
-                    'id': amenity.id,
-                    'name': amenity.name
-                })
+        for amenity in getattr(place, 'amenities', []):
+            amenities.append({
+                'id': amenity.id,
+                'name': amenity.name
+            })
     
     base = {
         'id': place.id,
