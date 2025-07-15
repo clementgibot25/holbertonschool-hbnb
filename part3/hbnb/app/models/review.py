@@ -4,6 +4,7 @@
 from app import db
 import uuid
 from app.models.base_model import BaseModel
+from sqlalchemy.orm import validates
 
 class Review(BaseModel):
     """Represents a user review for a place.
@@ -40,3 +41,10 @@ class Review(BaseModel):
         self.rating = rating
         self.place_id = place_id
         self.user_id = user_id
+
+    @validates('rating')
+    def validate_rating(self, key, value):
+        value = int(value)
+        if not (1 <= value <= 5):
+            raise ValueError("rating must be between 1 and 5")
+        return value
