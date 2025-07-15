@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """Defines the Place model for the application."""
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from app import db
 import uuid
 from app.models.base_model import BaseModel
@@ -66,51 +66,35 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner_id = owner_id
-        self.user = User.get(owner_id)
         self.reviews: List['Review'] = []
         self.amenities: List['Amenity'] = []
 
-    # --------------------
-    # Property validations
-    # --------------------
-    @property
-    def price(self) -> float:
-        return self._price
-
-    @price.setter
-    def price(self, value: float):
+    @validates('price')
+    def validate_price(self, key, value):
         try:
             value = float(value)
         except (TypeError, ValueError):
             raise ValueError("price must be a number")
         if value < 0:
             raise ValueError("price must be non-negative")
-        self._price = value
+        return value
 
-    @property
-    def latitude(self) -> float:
-        return self._latitude
-
-    @latitude.setter
-    def latitude(self, value: float):
+    @validates('latitude')
+    def validate_latitude(self, key, value):
         try:
             value = float(value)
         except (TypeError, ValueError):
             raise ValueError("latitude must be a number")
         if not -90 <= value <= 90:
             raise ValueError("latitude must be between -90 and 90")
-        self._latitude = value
+        return value
 
-    @property
-    def longitude(self) -> float:
-        return self._longitude
-
-    @longitude.setter
-    def longitude(self, value: float):
+    @validates('longitude')
+    def validate_longitude(self, key, value):
         try:
             value = float(value)
         except (TypeError, ValueError):
             raise ValueError("longitude must be a number")
         if not -180 <= value <= 180:
             raise ValueError("longitude must be between -180 and 180")
-        self._longitude = value
+        return value
