@@ -32,5 +32,8 @@ class Amenity(BaseModel):
             dict: Dictionary containing the amenity's attributes
         """
         return {
-            'name': self.name
+            'id': str(self.id),
+            'name': self.name,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
