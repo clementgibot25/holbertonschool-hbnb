@@ -25,7 +25,7 @@ class PlaceService:
     places, as well as managing place amenities and reviews.
     """
     
-    def __init__(self, repository: Repository = None, user_service=None):
+    def __init__(self, repository: Optional[Repository] = None, user_service=None):
         """Initialize the PlaceService with a repository and services.
         
         Args:
@@ -64,7 +64,7 @@ class PlaceService:
 
     def create_place(self, title: str, description: str, price: float,
                    latitude: float, longitude: float, owner_id: str,
-                   amenities: List[str] = None) -> Optional[Place]:
+                   amenities: Optional[List[str]] = None) -> Optional[Place]:
         """Create a new place with the provided information.
         
         Args:
@@ -99,8 +99,14 @@ class PlaceService:
             owner_id=owner_id
         )
         place.reviews = []
-        # Store the list of amenity IDs
-        place.amenities = amenities or []
+        
+        # Associate amenities if provided
+        if amenities:
+            from app.services.facade import hbnb_facade as facade
+            for amenity_id in amenities:
+                amenity = facade.amenity_service.get_amenity(amenity_id)
+                if amenity:
+                    place.amenities.append(amenity)
     
         self.repository.add(place)
     
