@@ -87,10 +87,6 @@ models/__pycache__/
 .coverage
 htmlcov/
 
-# Local development
-instance/
-.webassets-cache
-
 # Jupyter Notebook
 .ipynb_checkpoints
 
