@@ -1,10 +1,10 @@
-# HolbertonBnB (HBnB) – Part 3: Database Integration
+# HolbertonBnB (HBnB) – Part 3: Database Integration & Authentication
 
 ## Overview
 
-**Part 3** of the AirBnB clone project brings full database integration to the RESTful API previously developed. This phase transitions the application from in-memory data storage to a persistent SQLite backend, enabling robust data management, scalability, and real-world deployment readiness.
+**Part 3** of the AirBnB clone project brings full database integration and JWT authentication to the RESTful API. This phase transitions the application from in-memory data storage to a persistent SQLite backend with SQLAlchemy ORM, enabling robust data management, user authentication, and real-world deployment readiness.
 
-The project continues to follow a modular, layered architecture, ensuring maintainability and extensibility. All business logic, validation, and API endpoints are now backed by a real database, providing a more realistic and production-like experience.
+The project follows a modular, layered architecture with clear separation of concerns between API, business logic, data persistence, and authentication layers.
 
 ---
 
@@ -42,8 +42,9 @@ The project continues to follow a modular, layered architecture, ensuring mainta
 
 1. **Initialize the database schema and seed data:**
    ```bash
-   sqlite3 test.db < create_table.sql
-   sqlite3 test.db < insert_table.sql
+   cd instance
+   sqlite3 development.db < create_tables.sql
+   sqlite3 development.db < insert_data.sql
    ```
 
 ### Running the Application
@@ -59,12 +60,12 @@ python run.py
 
 ## ✨ What's New in Part 3
 
-- **Persistent Storage:** All data is now stored in a SQLite database instead of memory.
-- **Database Schema:** Tables and relationships are defined in `create_table.sql`.
-- **Data Seeding:** Example data is loaded via `insert_table.sql`.
-- **Model Enhancements:** Models now include validation logic and database integration.
-- **Separation of Concerns:** Clear distinction between API, business logic, and data layers.
-- **Production-Ready Structure:** The codebase is ready for further extension (e.g., PostgreSQL, MySQL).
+- **🔐 JWT Authentication:** Secure user authentication with JSON Web Tokens
+- **🗄️ Persistent Storage:** All data stored in SQLite database with SQLAlchemy ORM
+- **✅ Data Validation:** SQLAlchemy validators for data integrity
+- **🧪 Comprehensive Testing:** Automated test suite covering all endpoints
+- **🔧 Production-Ready:** Modular architecture ready for scaling
+- **📊 Database Schema:** Proper relationships and constraints
 
 ---
 
@@ -75,170 +76,154 @@ hbnb/
 ├── app/
 │   ├── __init__.py
 │   ├── api/
-│   ├── models/
-│   ├── persistence/
-│   └── services/
-├── create_table.sql
-├── insert_table.sql
-├── requirements.txt
-├── run.py
-└── test.db
-```
-
----
-
-## 🗄️ Database
-
-- **Engine:** SQLite (easy to use, cross-platform, file-based)
-- **Schema:** Defined in `create_table.sql`
-- **Seeding:** Initial data in `insert_table.sql`
-- **Usage:** All API operations now interact with persistent data
-
----
-
-## 🧪 Testing
-
-Test the API using:
-- Swagger UI (root URL)
-- cURL or HTTPie (command-line)
-- Postman (GUI)
-
-Example:
-```bash
-curl -X GET http://localhost:5000/api/v1/places/
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please submit a Pull Request or open an Issue for suggestions.
-
----
-
-## 📄 License
-
-This project is part of the Holberton School curriculum.
-
----
-
-**Authors:**  
-- Clément Gibot  
-- Arnaud Tilawat  
-- Maxime Naguet
-
----
-
-A simplified AirBnB clone implementing RESTful API and business logic using Python, Flask, and Flask-RESTx. This project features a modular, scalable architecture that separates presentation, business, and persistence layers, preparing for future database integration and authentication.
-
----
-
-## 🏗️ Project Architecture
-
-```
-hbnb/
-├── app/
-│   ├── __init__.py
-│   ├── api/
 │   │   ├── __init__.py
 │   │   └── v1/
 │   │       ├── __init__.py
+│   │       ├── auth.py           # Authentication endpoints
 │   │       ├── amenities.py      # Amenities endpoints
 │   │       ├── places.py         # Places endpoints
 │   │       ├── reviews.py        # Reviews endpoints
 │   │       └── users.py          # Users endpoints
 │   ├── models/
 │   │   ├── __init__.py
-│   │   ├── amenity.py           # Amenity model
+│   │   ├── amenity.py           # Amenity model with validation
 │   │   ├── base_model.py        # Base model with common fields
-│   │   ├── place.py             # Place model
-│   │   ├── review.py            # Review model
-│   │   └── user.py              # User model
+│   │   ├── place.py             # Place model with validators
+│   │   ├── review.py            # Review model with rating validation
+│   │   └── user.py              # User model with password hashing
 │   ├── persistence/
 │   │   ├── __init__.py
-│   │   ├── in_memory_repository.py  # In-memory storage implementation
-│   │   └── repository.py            # Repository interface
-│   ├── services/
-│   │   ├── __init__.py
-│   │   ├── amenity_service.py   # Amenity business logic
-│   │   ├── facade.py            # Facade pattern implementation
-│   │   ├── place_service.py     # Place business logic
-│   │   ├── review_service.py    # Review business logic
-│   │   └── user_service.py      # User business logic
-│   └── tests/                   # Test files
-├── config.py                    # Configuration settings
+│   │   ├── amenity_repository.py # Amenity data access
+│   │   ├── place_repository.py   # Place data access
+│   │   ├── repository.py         # Repository interface
+│   │   ├── review_repository.py  # Review data access
+│   │   └── user_repository.py    # User data access
+│   └── services/
+│       ├── __init__.py
+│       ├── amenity_service.py   # Amenity business logic
+│       ├── facade.py            # Facade pattern implementation
+│       ├── place_service.py     # Place business logic
+│       ├── review_service.py    # Review business logic
+│       └── user_service.py      # User business logic
+├── instance/
+│   ├── create_tables.sql        # Database schema
+│   ├── insert_data.sql          # Initial data seeding
+│   ├── development.db           # SQLite database (auto-generated)
+│   └── comprehensive_test_hbnb.sh # Complete test suite
+├── config.py                    # Application configuration
 ├── requirements.txt             # Python dependencies
 ├── run.py                      # Application entry point
 └── README.md
 ```
 
-### 🎯 Layered Architecture
-
-- **🌐 API Layer** (`app/api/v1/`): RESTful endpoints with Flask-RESTx for automatic documentation
-- **🏛️ Facade Layer** (`app/services/facade.py`): Unified interface orchestrating all business operations
-- **🔧 Business Logic** (`app/services/`): Core business operations and individual service classes
-- **📊 Models** (`app/models/`): Data models with validation and relationships
-- **💾 Persistence** (`app/persistence/`): Repository pattern with in-memory storage
-
 ---
 
-## 🚀 Quick Start
+## 🔐 Authentication
 
-### Prerequisites
-- Python 3.8+
-- pip (Python package installer)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd holbertonschool-hbnb/part2/hbnb
-   ```
-
-2. **Set up virtual environment** (recommended)
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### Running the Application
-
+### Login
 ```bash
-python run.py
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@hbnb.io","password":"admin123"}'
 ```
 
-The API will be available at:
-- **API Base URL**: `http://localhost:5000/`
-- **Interactive Documentation**: `http://localhost:5000/` (Swagger UI)
+### Using Authentication
+```bash
+curl -X GET http://localhost:5000/api/v1/users/ \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Default Admin User
+- **Email:** admin@hbnb.io
+- **Password:** admin123
 
 ---
 
-## ✨ Features
+## 🗄️ Database
 
-### Core Functionality
-- **User Management**: Create, read, update users with email validation
-- **Place Management**: Properties with location, pricing, and amenities
-- **Review System**: User reviews with ratings for places
-- **Amenity Management**: Configurable amenities for places
+- **Engine:** SQLite with SQLAlchemy ORM
+- **File:** `instance/development.db`
+- **Schema:** Defined in `instance/create_tables.sql`
+- **Seeding:** Initial data in `instance/insert_data.sql`
+- **Validation:** SQLAlchemy validators for data integrity
 
-### Technical Features
-- **RESTful API Design**: Clean, consistent endpoint structure
-- **Data Serialization**: Extended responses with nested relationships
-- **Input Validation**: Comprehensive data validation and error handling
-- **Modular Architecture**: Easy to extend and maintain
-- **Auto-generated Documentation**: Interactive Swagger/OpenAPI docs
+### Database Schema
+- **Users:** Authentication, profiles, admin roles
+- **Places:** Properties with location, pricing, amenities
+- **Reviews:** User reviews with ratings (1-5)
+- **Amenities:** Configurable features for places
+- **Place-Amenity:** Many-to-many relationship
 
-### API Endpoints Overview
-- `GET/POST/PUT /api/v1/users/` - User management (create, read, update)
-- `GET/POST/PUT /api/v1/places/` - Place management (create, read, update)
-- `GET/POST/PUT/DELETE /api/v1/reviews/` - Review management (full CRUD operations)
-- `GET/POST/PUT /api/v1/amenities/` - Amenity management (create, read, update)
+---
+
+## 🧪 Testing
+
+### Automated Test Suite
+Run the comprehensive test suite:
+```bash
+cd instance
+./comprehensive_test_hbnb.sh
+```
+
+This script tests:
+- ✅ Authentication endpoints
+- ✅ Users CRUD operations
+- ✅ Amenities CRUD operations  
+- ✅ Places CRUD operations
+- ✅ Reviews CRUD operations
+- ✅ Error handling (404, 401, 400)
+
+### Manual Testing
+Test the API using:
+- **Swagger UI:** Available at `http://localhost:5000/`
+- **cURL:** Command-line HTTP client
+- **Postman:** GUI API testing platform
+
+Example requests:
+```bash
+# Get all users
+curl -X GET http://localhost:5000/api/v1/users/
+
+# Create a place (requires authentication)
+curl -X POST http://localhost:5000/api/v1/places/ \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"My Place","description":"A great place","price":100.0,"latitude":40.7128,"longitude":-74.0060}'
+```
+
+---
+
+## 📡 API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/login` - User login
+- `GET /api/v1/auth/protected` - Test protected endpoint
+
+### Users
+- `GET /api/v1/users/` - List all users
+- `POST /api/v1/users/` - Create new user (admin only)
+- `GET /api/v1/users/{id}` - Get specific user
+- `PUT /api/v1/users/{id}` - Update user (admin only)
+
+### Places
+- `GET /api/v1/places/` - List all places
+- `POST /api/v1/places/` - Create new place (authenticated)
+- `GET /api/v1/places/{id}` - Get specific place
+- `PUT /api/v1/places/{id}` - Update place (owner only)
+
+### Reviews
+- `GET /api/v1/reviews/` - List all reviews
+- `POST /api/v1/reviews/` - Create new review (authenticated)
+- `GET /api/v1/reviews/{id}` - Get specific review
+- `PUT /api/v1/reviews/{id}` - Update review (owner only)
+- `DELETE /api/v1/reviews/{id}` - Delete review (owner only)
+- `GET /api/v1/reviews/places/{place_id}/reviews` - Get reviews for a place
+
+### Amenities
+- `GET /api/v1/amenities/` - List all amenities
+- `POST /api/v1/amenities/` - Create new amenity (admin only)
+- `GET /api/v1/amenities/{id}` - Get specific amenity
+- `PUT /api/v1/amenities/{id}` - Update amenity (admin only)
 
 ---
 
@@ -247,57 +232,55 @@ The API will be available at:
 ```txt
 flask>=2.0.0          # Web framework
 flask-restx>=1.0.0    # REST API extension with documentation
-```
-
-All dependencies are listed in `requirements.txt`.
-
----
-
-## 🧪 Testing
-
-You can test the API using:
-- **Swagger UI**: Available at the root URL when running the application
-- **cURL**: Command-line HTTP client
-- **Postman**: API testing platform
-- **HTTPie**: User-friendly command-line HTTP client
-
-Example cURL request:
-```bash
-curl -X GET http://localhost:5000/api/v1/users/
+flask-sqlalchemy>=3.0.0  # SQLAlchemy integration
+flask-jwt-extended>=4.5.0  # JWT authentication
+bcrypt>=4.0.0         # Password hashing
 ```
 
 ---
 
-## 🎯 Project Vision
+## ✨ Features
 
-This implementation focuses on the **Presentation** and **Business Logic** layers:
+### Core Functionality
+- **🔐 JWT Authentication:** Secure user login with token-based sessions
+- **👥 User Management:** Full CRUD with admin roles and password hashing
+- **🏠 Place Management:** Properties with location, pricing, and amenities
+- **⭐ Review System:** User reviews with rating validation (1-5)
+- **🏷️ Amenity Management:** Configurable features for places
 
-### Current Phase (Part 3)
-- ✅ Integration with a database (SQLite)
-- ✅ Use of SQLAlchemy for ORM
-- ✅ Modular architecture ready for scaling
-
-### Future Phases
-- 🔄 **Part 4**: JWT authentication and authorization
-
----
-
-## 🏛️ Design Patterns
-
-- **Facade Pattern**: Simplifies complex business operations
-- **Repository Pattern**: Abstracts data access layer
-- **Service Layer**: Separates business logic from presentation
-- **Model-View-Controller**: Clear separation of concerns
+### Technical Features
+- **🗄️ SQLAlchemy ORM:** Object-relational mapping with validation
+- **✅ Data Validation:** SQLAlchemy validators for data integrity
+- **🔄 Business Logic:** Service layer with proper separation of concerns
+- **📊 Relationships:** Proper foreign keys and many-to-many associations
+- **🧪 Testing:** Comprehensive automated test suite
+- **📚 Auto-documentation:** Interactive Swagger/OpenAPI docs
 
 ---
 
-## 📚 Resources
+## 🏛️ Architecture Patterns
 
-- [Flask Documentation](https://flask.palletsprojects.com/en/stable/)
-- [Flask-RESTx Documentation](https://flask-restx.readthedocs.io/en/latest/)
-- [REST API Best Practices](https://restfulapi.net/)
-- [Python Project Structure Guide](https://docs.python-guide.org/writing/structure/)
-- [Facade Pattern in Python](https://refactoring.guru/design-patterns/facade/python/example)
+- **🔐 Authentication Layer:** JWT-based security
+- **🌐 API Layer:** RESTful endpoints with Flask-RESTx
+- **🔧 Service Layer:** Business logic and operations
+- **📊 Model Layer:** Data models with SQLAlchemy
+- **💾 Repository Layer:** Data access abstraction
+- **🗄️ Database Layer:** SQLite with SQLAlchemy ORM
+
+---
+
+## 🚀 Development
+
+### Configuration
+- Database: `instance/development.db`
+- Debug mode: Enabled in development
+- JWT secret: Configurable via environment variables
+
+### File Structure
+- **Models:** Data validation and relationships
+- **Services:** Business logic and operations
+- **API:** RESTful endpoints and serialization
+- **Instance:** Database files and scripts (gitignored)
 
 ---
 
@@ -319,8 +302,10 @@ This project is part of the Holberton School curriculum.
 
 ## 👥 Authors
 
-- [Clément Gibot](https://github.com/clementgibot25)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/clementgibot25)
-- [Arnaud Tilawat](https://github.com/TilawatArnaud)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/TilawatArnaud)
-- [Maxime Naguet](https://github.com/Roupies)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Badge](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/Roupies)
+- [Clément Gibot](https://github.com/clementgibot25)
+- [Arnaud Tilawat](https://github.com/TilawatArnaud)  
+- [Maxime Naguet](https://github.com/Roupies)
 
 ---
+
+**Status:** ✅ Production-ready with full database integration and authentication
