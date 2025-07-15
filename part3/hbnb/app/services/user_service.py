@@ -136,9 +136,13 @@ class UserService:
         user = self.get_user(user_id)
         if not user:
             return False
-            
-        if place_id not in user.places:
-            user.places.append(place_id)
+        # Import ici pour éviter les imports circulaires
+        from app.models.place import Place
+        place = Place.query.get(place_id)
+        if not place:
+            return False
+        if place not in user.places:
+            user.places.append(place)
             return True
         return False
     
