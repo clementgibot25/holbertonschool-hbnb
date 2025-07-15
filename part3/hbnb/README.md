@@ -1,4 +1,133 @@
-# HolbertonBnB (HBnB) – Part 2: API & Business Logic
+# HolbertonBnB (HBnB) – Part 3: Database Integration
+
+## Overview
+
+**Part 3** of the AirBnB clone project brings full database integration to the RESTful API previously developed. This phase transitions the application from in-memory data storage to a persistent SQLite backend, enabling robust data management, scalability, and real-world deployment readiness.
+
+The project continues to follow a modular, layered architecture, ensuring maintainability and extensibility. All business logic, validation, and API endpoints are now backed by a real database, providing a more realistic and production-like experience.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8+
+- pip (Python package installer)
+- SQLite (included with Python standard library)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd holbertonschool-hbnb/part3/hbnb
+   ```
+
+2. **Set up a virtual environment** (recommended)
+   ```bash
+   python3 -m venv venv
+   # On Windows:
+   venv\Scripts\activate
+   # On Unix/MacOS:
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Database Setup
+
+1. **Initialize the database schema and seed data:**
+   ```bash
+   sqlite3 test.db < create_table.sql
+   sqlite3 test.db < insert_table.sql
+   ```
+
+### Running the Application
+
+```bash
+python run.py
+```
+
+- The API will be available at: `http://localhost:5000/`
+- Interactive API docs (Swagger UI): `http://localhost:5000/`
+
+---
+
+## ✨ What's New in Part 3
+
+- **Persistent Storage:** All data is now stored in a SQLite database instead of memory.
+- **Database Schema:** Tables and relationships are defined in `create_table.sql`.
+- **Data Seeding:** Example data is loaded via `insert_table.sql`.
+- **Model Enhancements:** Models now include validation logic and database integration.
+- **Separation of Concerns:** Clear distinction between API, business logic, and data layers.
+- **Production-Ready Structure:** The codebase is ready for further extension (e.g., PostgreSQL, MySQL).
+
+---
+
+## 🏗️ Project Structure
+
+```
+hbnb/
+├── app/
+│   ├── __init__.py
+│   ├── api/
+│   ├── models/
+│   ├── persistence/
+│   └── services/
+├── create_table.sql
+├── insert_table.sql
+├── requirements.txt
+├── run.py
+└── test.db
+```
+
+---
+
+## 🗄️ Database
+
+- **Engine:** SQLite (easy to use, cross-platform, file-based)
+- **Schema:** Defined in `create_table.sql`
+- **Seeding:** Initial data in `insert_table.sql`
+- **Usage:** All API operations now interact with persistent data
+
+---
+
+## 🧪 Testing
+
+Test the API using:
+- Swagger UI (root URL)
+- cURL or HTTPie (command-line)
+- Postman (GUI)
+
+Example:
+```bash
+curl -X GET http://localhost:5000/api/v1/places/
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please submit a Pull Request or open an Issue for suggestions.
+
+---
+
+## 📄 License
+
+This project is part of the Holberton School curriculum.
+
+---
+
+**Authors:**  
+- Clément Gibot  
+- Arnaud Tilawat  
+- Maxime Naguet
+
+---
 
 A simplified AirBnB clone implementing RESTful API and business logic using Python, Flask, and Flask-RESTx. This project features a modular, scalable architecture that separates presentation, business, and persistence layers, preparing for future database integration and authentication.
 
