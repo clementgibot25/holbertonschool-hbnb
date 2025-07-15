@@ -1,8 +1,3 @@
-# Database files
-instance/*.db
-instance/development.db
-instance/hbnb.db
-
 # Logs
 instance/*.log
 instance/server.log
