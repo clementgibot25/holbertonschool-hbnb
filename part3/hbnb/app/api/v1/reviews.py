@@ -216,7 +216,11 @@ class PlaceReviewList(Resource):
         Retrieve all reviews associated with a specific place,
         including user information and ratings.
         """
-        reviews = facade.get_reviews_by_place(place_id)
-        if not reviews:
+        # First check if the place exists
+        place = facade.get_place(place_id)
+        if not place:
             return {'error': 'Place not found'}, 404
+        
+        # Get reviews for the place (can be empty list)
+        reviews = facade.get_reviews_by_place(place_id)
         return [{'id': review.id, 'text': review.text, 'rating': review.rating, 'user_id': review.user_id, 'place_id': review.place_id} for review in reviews], 200
