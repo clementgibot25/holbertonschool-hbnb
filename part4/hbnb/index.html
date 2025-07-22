@@ -4,25 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of Places</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/icon.png">
 </head>
 <body>
     <header>
         <nav>
-            <a href="login.html" id="login-link">Login</a>
+            <a href="index.html"><img src="images/logo.png" id="home-link" alt="Home" class="logo"></a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
         </nav>
     </header>
     <main>
         <section id="filter">
+            <h2>Available Places</h2>
             <label for="price-filter">Max Price:</label>
             <select id="price-filter">
                 <!-- Options will be populated dynamically -->
             </select>
         </section>
-        <section id="places-list">
+        <section id="places-list" class="place-card">
+            <ul class="cards-container">
+                <li class="card">
+                  <h3>Beautiful Beach House</h3>
+                  <p>Price per night: $150</p>
+                  <button>View Details</button>
+                </li>
+                <li class="card">
+                  <h3>Cozy Cabin</h3>
+                  <p>Price per night: $100</p>
+                  <button>View Details</button>
+                </li>
+                <li class="card">
+                  <h3>Modern Apartment</h3>
+                  <p>Price per night: $200</p>
+                  <button>View Details</button>
+                </li>
+              </ul>
             <!-- List of places will be populated dynamically -->
         </section>
     </main>
+    <footer>
+        <p>&copy; 2025 HBNB. All rights reserved.</p>
+    </footer>
     <script src="scripts.js"></script>
 </body>
 </html>
