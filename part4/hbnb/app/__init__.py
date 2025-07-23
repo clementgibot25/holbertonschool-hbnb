@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from app.config import DevelopmentConfig
+from flask_cors import CORS
 
 # Initialiser les extensions sans les configurer
 db = SQLAlchemy()
@@ -24,7 +25,7 @@ def create_app(config_class=None):
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
-
+    CORS(app)
     # Créer les tables dans le contexte de l'application
     with app.app_context():
         # Importer TOUS les modèles pour que SQLAlchemy les connaisse
